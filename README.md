@@ -97,3 +97,32 @@ DATASET "radiance" {
 
 https://en.wikipedia.org/wiki/Sentinel-1
 Sentinel-1 will provide continuity of data from the ERS and Envisat missions
+
+-    Raw Level 0 data
+-    Processed Level 1 Single Look Complex (SLC) data:
+        Complex images with phase and amplitude of specified areas
+-    Ground Range Detected (GRD) Level 1 data:
+        Only systematically distributed multi-looked intensity
+-    Level 2 Ocean (OCN) data:
+        Systematically distributed data of ocean's geophysical parameters
+
+2015 they wrote:
+
+```
+The Sentinel-1 Scientific Data Hub provides free and open access to a
+Rolling Archive of Sentinel-1 Level-0 and Level-1 user products.
+
+The S-1 Scientific data Hub Rolling Archive maintains the latest 2
+months of products for download via HTTP.  The target of the 2 months
+rolling archive will be reached in progression starting from a rolling
+period of 2 weeks commencing on the 3rd of October.
+```
+
+I think I am more interested in this:
+
+```
+The Copernicus Open Access Hub (previously known as Sentinels
+Scientific Data Hub) provides complete, free and open access to
+Sentinel-1, Sentinel-2 and Sentinel-3 user products, starting from the
+In-Orbit Commissioning Review (IOCR).
+```
