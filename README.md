@@ -132,3 +132,18 @@ API hub for data download
 
 - They have a Copernicus Sentinel App for Android and iOS, it has good
   ratings
+- Sentinel-1 is a constallation of 2 Satellites orbiting 180deg apart. Imaging earth every six days
+- resolution is 2-4m https://sentinel.esa.int/web/sentinel/user-guides/sentinel-1-sar/resolutions/level-1-single-look-complex
+- radar carrier 5.405GHz 4.141kW peak power
+- pulse repition 1kHz - 3kHz
+- instrument duty cycle 25min per orbit
+
+- esa echoes in space - land: crop type mapping with sentinel-1
+- youtube eo college contains course material
+- software http://step.esa.int/main/download/
+
+- 6cm rf waves interact are scattered back by surface waves on ocean if bragg condition is met
+- illumination angle affects detected ocean surface wave period
+- longer surface waves (10s of meters) modulate bragg signal
+- not all data can be sent back, cat claw pattern to get general idea of ocean conditions
+- ship tracking would require to capture large amounts of data
