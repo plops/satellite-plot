@@ -126,3 +126,9 @@ Scientific Data Hub) provides complete, free and open access to
 Sentinel-1, Sentinel-2 and Sentinel-3 user products, starting from the
 In-Orbit Commissioning Review (IOCR).
 ```
+
+Open Access hub for interactive GUI
+API hub for data download
+
+- They have a Copernicus Sentinel App for Android and iOS, it has good
+  ratings
