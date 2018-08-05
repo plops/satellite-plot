@@ -185,3 +185,12 @@ https://www.oceandatalab.com/8369d04b-9c25-4489-b3ca-70b96b30e42a
   frequency as Sentinel-1. The mutual interferences are observed on
   specific locations and times of the orbits and only when both
   instruments are transmitting simultaneously.
+
+- noise:
+https://sentinels.copernicus.eu/documents/247904/2142675/Thermal-Denoising-of-Products-Generated-by-Sentinel-1-IPF
+
+- quality:
+https://qc.sentinel1.eo.esa.int/disclaimer/
+
+- level-0 product specification:
+https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
