@@ -129,10 +129,12 @@ In-Orbit Commissioning Review (IOCR).
 
 Open Access hub for interactive GUI
 API hub for data download
+https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Product-Definition
 
 - They have a Copernicus Sentinel App for Android and iOS, it has good
   ratings
 - Sentinel-1 is a constallation of 2 Satellites orbiting 180deg apart. Imaging earth every six days
+- same image every 12 days
 - resolution is 2-4m https://sentinel.esa.int/web/sentinel/user-guides/sentinel-1-sar/resolutions/level-1-single-look-complex
 - radar carrier 5.405GHz 4.141kW peak power
 - pulse repition 1kHz - 3kHz
@@ -142,8 +144,26 @@ API hub for data download
 - youtube eo college contains course material
 - software http://step.esa.int/main/download/
 
-- 6cm rf waves interact are scattered back by surface waves on ocean if bragg condition is met
+- 6cm rf waves interact are scattered back by surface waves on ocean if bragg condition is met (usually at 1-2m/s wind)
 - illumination angle affects detected ocean surface wave period
 - longer surface waves (10s of meters) modulate bragg signal
 - not all data can be sent back, cat claw pattern to get general idea of ocean conditions
 - ship tracking would require to capture large amounts of data
+
+- ocean virtual laboratory allows zooming into 20x20 km images with wave patterns https://ovl.oceandatalab.com
+- behind french polynesian islands different wave patterns due to diffraction
+- waves can travel in marginal sea ice zone
+
+- python code for sar processing
+https://github.com/senbox-org/snap-engine/tree/master/snap-python/src/main/resources/snappy/examples
+https://senbox.atlassian.net/wiki/spaces/SNAP/pages/19300362/How+to+use+the+SNAP+API+from+Python
+https://github.com/senbox-org/snap-examples
+https://github.com/johntruckenbrodt/pyroSAR
+
+- SEAScope SA is the next generation synergy analysis standalone tool.
+Today only available for Linux and working with local datasets, it
+allows an even more fluid visualization experience, and more
+interaction and manipulation of the datasets thanks to an extensive
+use of the GPU and the two way communication with iPython notebooks
+
+https://seascope.oceandatalab.com/
