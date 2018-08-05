@@ -136,6 +136,10 @@ alternatively data can be obtained from DAAC:
 https://www.asf.alaska.edu/sentinel/
 (complete historic archive of processed files, within 3 days of acquisition)
 
+Precision State Vector (orbits) within 20 days after data acquisition.
+
+
+
 - They have a Copernicus Sentinel App for Android and iOS, it has good
   ratings
 - Sentinel-1 is a constallation of 2 Satellites orbiting 180deg apart. Imaging earth every six days
