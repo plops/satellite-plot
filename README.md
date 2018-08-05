@@ -99,6 +99,7 @@ https://en.wikipedia.org/wiki/Sentinel-1
 Sentinel-1 will provide continuity of data from the ERS and Envisat missions
 
 -    Raw Level 0 data
+        Level-0 products are available to data users for only the SM, IW and EW modes.
 -    Processed Level 1 Single Look Complex (SLC) data:
         Complex images with phase and amplitude of specified areas
 -    Ground Range Detected (GRD) Level 1 data:
@@ -178,3 +179,9 @@ use of the GPU and the two way communication with iPython notebooks
 https://seascope.oceandatalab.com/
 
 https://www.oceandatalab.com/8369d04b-9c25-4489-b3ca-70b96b30e42a
+
+- interference: mutual interference that can occur between Sentinel-1
+  and the Canadian Radarsat-2 satellite which operates at the same
+  frequency as Sentinel-1. The mutual interferences are observed on
+  specific locations and times of the orbits and only when both
+  instruments are transmitting simultaneously.
