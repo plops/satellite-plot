@@ -128,11 +128,13 @@ In-Orbit Commissioning Review (IOCR).
 ```
 
 Open Access hub for interactive GUI
+(only recent months, within 24hours of acquisition)
 API hub for data download https://scihub.copernicus.eu/apihub/search
 https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Product-Definition
 
 alternatively data can be obtained from DAAC:
 https://www.asf.alaska.edu/sentinel/
+(complete historic archive of processed files, within 3 days of acquisition)
 
 - They have a Copernicus Sentinel App for Android and iOS, it has good
   ratings
