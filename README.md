@@ -194,3 +194,22 @@ https://qc.sentinel1.eo.esa.int/disclaimer/
 
 - level-0 product specification:
 https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
+
+BB_TTTR_LF
+
+- BB = instrument mode/type of data, possible values “SM”, “EW”, “IW”,
+“WV”, “RF”, “EN”, “AN” (for SAR instrument modes Stripmap, Extra Wide
+Swath, Interferometric Wide Swath, Wave, and RF Characterisation Mode
+, Elevation Notch and Azimuth Notch Modes respectively), “GP” (for
+GPSR) or “HK” (for HKTM);
+
+
+- TTT = “RAW” fixed string, indicating RAW L0 Products;
+
+- R = “_” fixed string
+
+- L = “0” fixed string, indicating L0 Processing Level;
+
+- F = Product Class, possible values “S”, “C”, “N” or “A” (for SAR L0
+Sta ndard, SAR L0 Cal, SAR L0 Noise and SAR L0 Annotations
+respectively);
