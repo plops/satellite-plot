@@ -128,8 +128,11 @@ In-Orbit Commissioning Review (IOCR).
 ```
 
 Open Access hub for interactive GUI
-API hub for data download
+API hub for data download https://scihub.copernicus.eu/apihub/search
 https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Product-Definition
+
+alternatively data can be obtained from DAAC:
+https://www.asf.alaska.edu/sentinel/
 
 - They have a Copernicus Sentinel App for Android and iOS, it has good
   ratings
@@ -167,3 +170,5 @@ interaction and manipulation of the datasets thanks to an extensive
 use of the GPU and the two way communication with iPython notebooks
 
 https://seascope.oceandatalab.com/
+
+https://www.oceandatalab.com/8369d04b-9c25-4489-b3ca-70b96b30e42a
