@@ -178,3 +178,7 @@ use of the GPU and the two way communication with iPython notebooks
 https://seascope.oceandatalab.com/
 
 https://www.oceandatalab.com/8369d04b-9c25-4489-b3ca-70b96b30e42a
+
+
+- raw sar data description
+https://earth.esa.int/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
