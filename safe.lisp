@@ -6,3 +6,14 @@
 
 ;; measurement data component binary file
 ;; containing stream of downlinked ISPs details in 3.3.1.1.2 (p.64)
+;; big-endian
+;; isp-packet = packet-primary-header + packet-data-field
+;;              6 bytes                 <= 65534 bytes
+;; packet-primary-header =
+;;   packet-version-number (3bits) +
+;;   packet-id (13bits) + packet-sequence-control (2bytes) + packet-data-length (2bytes)
+;; packet-secondary-header (62bytes) = user-data-field (<= 65472 bytes)
+
+;; CFI-06 shows further details of the ISP structure
+
+
