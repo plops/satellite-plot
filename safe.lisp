@@ -1,3 +1,13 @@
+;; martin@localhost ~/quicklisp/local-projects
+;; $ git clone https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary
+
+(ql:quickload :lisp-binary)
+
+(defpackage :g
+  (:use :cl :lisp-binary))
+
+(in-package :g)
+
 (defparameter *fn* (elt (directory "/dev/shm/S*/*-??????.dat") 0))
 
 (defparameter *f*
