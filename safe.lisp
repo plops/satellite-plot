@@ -146,8 +146,28 @@
 ;;    :IGNORE-0 0
 ;;    :TEST-MODE 0
 ;;    :RX-CHANNEL-ID 1
-;;    :INSTRUMENT-CONFIGURATION-ID 6)
-
+;;    :INSTRUMENT-CONFIGURATION-ID 6
+;;    :SUB-COMMUTATED-INDEX 33
+;;    :SUB-COMMUTATED-DATA 47723
+;;    :SPACE-PACKET-COUNT 200388
+;;    :PRI-COUNT 203239
+;;    :ERROR-FLAG 0
+;;    :IGNORE-1 0
+;;    :BAQ-MODE 12
+;;    :BAQ-BLOCK-LENGTH 31
+;;    :IGNORE-2 0
+;;    :RANGE-DECIMATION 8
+;;    :RX-GAIN 8
+;;    :TX-RAMP-RATE 34373
+;;    :TX-PULSE-START-FREQUENCY 12335
+;;    :TX-PULSE-LENGTH 1967
+;;    :IGNORE-3 0
+;;    :RANK 9
+;;    :PRI 21859
+;;    :SWST 6239
+;;    :SWL 13728
+;;    :SAB-SSB-MESSAGE 1073397
+;;    :SES-SSB-MESSAGE 393482)
 
 (defparameter *f*
  (open *fn* :direction :input :element-type '(unsigned-byte 8)))
