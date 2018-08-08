@@ -104,6 +104,24 @@
   (space-packet-count 0 :type 32) ;; from beginning of data take
   (pri-count 0 :type 32)
   ;; radar configuration support service
+  (error-flag 0 :type 1)
+  (ignore-1 0 :type 2)
+  (baq-mode 0 :type 5)
+  (baq-block-length 0 :type 8)
+  (ignore-2 0 :type 8)
+  (range-decimation 0 :type 8)
+  (rx-gain 0 :type 8)
+  (tx-ramp-rate 0 :type 16)
+  (tx-pulse-start-frequency 0 :type 16)
+  (tx-pulse-length 0 :type 24)
+  (ignore-3 0 :type 3)
+  (rank 0 :type 5)
+  (pri 0 :type 24)
+  (swst 0 :type 24)
+  (swl 0 :type 24)
+  (sab-ssb-message 0 :type 24)
+  (ses-ssb-message 0 :type 24)
+  
   ;; radar sample count service
   )
 
