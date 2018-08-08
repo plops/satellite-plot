@@ -95,7 +95,14 @@
   (rx-channel-id 0 :type 4)
   (instrument-configuration-id 0 :type 32)
   ;; sub-commutation ancillary data service
+  (sub-commutated-index 0 :type 8) ;; 1..64 slowly fills datastructure
+  ;; on p23,24,25 0 indicates invalid data word consistent set only
+  ;; after contiguous sequence 1..22 (pvt), 23..41 (attitude) or
+  ;; 42..64 (temperatures)
+  (sub-commutated-data 0 :type 16) 
   ;; counters service
+  (space-packet-count 0 :type 32) ;; from beginning of data take
+  (pri-count 0 :type 32)
   ;; radar configuration support service
   ;; radar sample count service
   )
