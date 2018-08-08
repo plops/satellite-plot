@@ -130,8 +130,14 @@
   (sab-ssb-elevation-beam-address 0 :type 4) ;; if calibration-p=1 sastest caltype
   (sab-ssb-ignore-1 0 :type 2)
   (sab-ssb-azimuth-beam-address 0 :type 10)
-  (ses-ssb-message 0 :type 24)
-  
+  ;;(ses-ssb-message 0 :type 24)
+  (ses-ssb-cal-mode 0 :type 2)
+  (ses-ssb-ignore-0 0 :type 1)
+  (ses-ssb-tx-pulse-number 0 :type 5)
+  (ses-ssb-signal-type 0 :type 4)
+  (ses-ssb-ignore-1 0 :type 3)
+  (ses-ssb-swap 0 :type 1)
+  (ses-ssb-swath-number 0 :type 8)
   ;; radar sample count service
   )
 
@@ -178,6 +184,59 @@
 ;;    :SWL 13728
 ;;    :SAB-SSB-MESSAGE 1073397
 ;;    :SES-SSB-MESSAGE 393482)
+ ;; #S(SPACE-PACKET1
+ ;;   :PACKET-VERSION-NUMBER 0
+ ;;   :PACKET-TYPE 0
+ ;;   :SECONDARY-HEADER-FLAG 1
+ ;;   :APPLICATION-PROCESS-ID-PROCESS-ID 65
+ ;;   :APPLICATION-PROCESS-ID-PACKET-CATEGORY 12
+ ;;   :SEQUENCE-FLAGS 3
+ ;;   :SEQUENCE-COUNT 3780
+ ;;   :DATA-LENGTH 15309
+ ;;   :COARSE-TIME 1217599483
+ ;;   :FINE-TIME 15700
+ ;;   :SYNC-MARKER 892270675
+ ;;   :DATA-TAKE-ID 84288864
+ ;;   :ECC-NUMBER INTERFEROMETRIC-WIDE-SWATH
+ ;;   :IGNORE-0 0
+ ;;   :TEST-MODE 0
+ ;;   :RX-CHANNEL-ID 1
+ ;;   :INSTRUMENT-CONFIGURATION-ID 6
+ ;;   :SUB-COMMUTATED-INDEX 33
+ ;;   :SUB-COMMUTATED-DATA 47723
+ ;;   :SPACE-PACKET-COUNT 200388
+ ;;   :PRI-COUNT 203239
+ ;;   :ERROR-FLAG 0
+ ;;   :IGNORE-1 0
+ ;;   :BAQ-MODE 12
+ ;;   :BAQ-BLOCK-LENGTH 31
+ ;;   :IGNORE-2 0
+ ;;   :RANGE-DECIMATION 8
+ ;;   :RX-GAIN 8
+ ;;   :TX-RAMP-RATE-POLARITY 1
+ ;;   :TX-RAMP-RATE-MAGNITUDE 1605
+ ;;   :TX-PULSE-START-FREQUENCY-POLARITY 0
+ ;;   :TX-PULSE-START-FREQUENCY-MAGNITUDE 12335
+ ;;   :TX-PULSE-LENGTH 1967
+ ;;   :IGNORE-3 0
+ ;;   :RANK 9
+ ;;   :PULSE-REPETITION-INTERVALL 21859
+ ;;   :SAMPLING-WINDOW-START-TIME 6239
+ ;;   :SAMPLING-WINDOW-LENGTH 13728
+ ;;   :SAB-SSB-CALIBRATION-P 0
+ ;;   :SAB-SSB-POLARISATION 1
+ ;;   :SAB-SSB-TEMP-COMP 0
+ ;;   :SAB-SSB-IGNORE-0 0
+ ;;   :SAB-SSB-ELEVATION-BEAM-ADDRESS 6
+ ;;   :SAB-SSB-IGNORE-1 0
+ ;;   :SAB-SSB-AZIMUTH-BEAM-ADDRESS 245
+ ;;   :SES-SSB-CAL-MODE 0
+ ;;   :SES-SSB-IGNORE-0 0
+ ;;   :SES-SSB-TX-PULSE-NUMBER 6
+ ;;   :SES-SSB-SIGNAL-TYPE 0
+ ;;   :SES-SSB-IGNORE-1 0
+ ;;   :SES-SSB-SWAP 1
+ ;;   :SES-SSB-SWATH-NUMBER 10)
 
 (defparameter *f*
  (open *fn* :direction :input :element-type '(unsigned-byte 8)))
