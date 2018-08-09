@@ -139,11 +139,22 @@
   (ses-ssb-swap 0 :type 1)
   (ses-ssb-swath-number 0 :type 8)
   ;; radar sample count service
+  (number-of-quads 0 :type 16)
+  (ignore-4 0 :type 8)
   )
 
 (with-open-binary-file (in *fn* :direction :input)
-  (let* ((file-size (file-length in)))
-    (read-binary 'space-packet1 in)))
+  (let* ((file-size (file-length in))
+	 (header (read-binary 'space-packet1 in)))
+    (with-slots (data-length) header
+      (let* ((pdl data-length)
+	     (len-sh 62)
+	     (len-ud (+ pdl (- len-sh) 1)))
+	(file-position in (+ (file-position in) len-ud))
+	(let ((header1 (read-binary 'space-packet1 in)))
+	 (list (file-position in) len-ud data-length header header1))))))
+
+
  ;; #S(SPACE-PACKET1
  ;;   :PACKET-VERSION-NUMBER 0
  ;;   :PACKET-TYPE 0
@@ -196,7 +207,7 @@
  ;;   :SES-SSB-SIGNAL-TYPE 0
  ;;   :SES-SSB-IGNORE-1 0
  ;;   :SES-SSB-SWAP 1
- ;;   :SES-SSB-SWATH-NUMBER 10)
+ ;;   :SES*-SSB-SWATH-NUMBER 10)
 
 (defparameter *f*
  (open *fn* :direction :input :element-type '(unsigned-byte 8)))
