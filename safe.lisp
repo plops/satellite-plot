@@ -166,10 +166,25 @@
 		(file-position in (+ (file-position in) len-ud))
 		header)))))))
 
-(class-slots )
 
-(mapcar #'sb-mop:slot-definition-name
- (sb-mop:class-direct-slots (class-of (elt *headers* 1))))
+(defmethod csv-header ((o space-packet1) s)
+  (format s "~{~a~^,~}~%"
+   (mapcar #'sb-mop:slot-definition-name
+	   (sb-mop:class-direct-slots (class-of o)))))
+
+(defmethod csv-line ((o space-packet1) s)
+  (let* ((slots (mapcar #'sb-mop:slot-definition-name
+			(sb-mop:class-direct-slots (class-of o))))
+	 (vals (mapcar #'(lambda (x) (slot-value o x))
+		       slots)))
+    (format s "~{~a~^,~}~%"
+	    vals)))
+
+(with-open-file (s "/dev/shm/headers.csv" :direction :output)
+  (csv-header (elt *headers* 0) s)
+  (loop for e in *headers* do
+       (csv-line e s)))
+
 
  ;; #S(SPACE-PACKET1
  ;;   :PACKET-VERSION-NUMBER 0
