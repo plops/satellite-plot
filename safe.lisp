@@ -152,7 +152,19 @@
 	     (len-ud (+ pdl (- len-sh) 1)))
 	(file-position in (+ (file-position in) len-ud))
 	(let ((header1 (read-binary 'space-packet1 in)))
-	 (list (file-position in) len-ud data-length header header1))))))
+	  (list (file-position in) len-ud data-length header header1))))))
+
+(with-open-binary-file (in *fn* :direction :input)
+  (let ((n (file-length in)))
+   (loop while (< (file-position in) n) do 
+	(let* ((header (read-binary 'space-packet1 in)))
+	  (with-slots (data-length) header
+	    (let* ((pdl data-length)
+		   (len-sh 62)
+		   (len-ud (+ pdl (- len-sh) 1)))
+	      (file-position in (+ (file-position in) len-ud))
+	      (format t "~a~%" (* 1.0 (/ (file-position in) n)))
+	      ))))))
 
 
  ;; #S(SPACE-PACKET1
