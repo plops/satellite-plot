@@ -154,18 +154,22 @@
 	(let ((header1 (read-binary 'space-packet1 in)))
 	  (list (file-position in) len-ud data-length header header1))))))
 
-(with-open-binary-file (in *fn* :direction :input)
-  (let ((n (file-length in)))
-   (loop while (< (file-position in) n) do 
-	(let* ((header (read-binary 'space-packet1 in)))
-	  (with-slots (data-length) header
-	    (let* ((pdl data-length)
-		   (len-sh 62)
-		   (len-ud (+ pdl (- len-sh) 1)))
-	      (file-position in (+ (file-position in) len-ud))
-	      (format t "~a~%" (* 1.0 (/ (file-position in) n)))
-	      ))))))
+(defparameter *headers*
+ (with-open-binary-file (in *fn* :direction :input)
+   (let ((n (file-length in)))
+     (loop while (< (file-position in) n) collect 
+	  (let* ((header (read-binary 'space-packet1 in)))
+	    (with-slots (data-length) header
+	      (let* ((pdl data-length)
+		     (len-sh 62)
+		     (len-ud (+ pdl (- len-sh) 1)))
+		(file-position in (+ (file-position in) len-ud))
+		header)))))))
 
+(class-slots )
+
+(mapcar #'sb-mop:slot-definition-name
+ (sb-mop:class-direct-slots (class-of (elt *headers* 1))))
 
  ;; #S(SPACE-PACKET1
  ;;   :PACKET-VERSION-NUMBER 0
