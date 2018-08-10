@@ -214,6 +214,17 @@
 	 (file-position in (+ user-data-position byte-nr))
 	 (ldb (byte 1 bit-nr) (read-byte in)))))))
 
+(defmacro gen-huffman-decoder (huffman-tree)
+  (labels ((frob (tree)
+	   (if (listp tree)
+	       `(if (next-bit)
+		    ,(frob (car tree))
+		    ,(frob (cdr tree)))
+	       tree)))
+    (frob huffman-tree)))
+
+(gen-huffman-decoder (0 (1 (2 (3)))))
+
 (0 (1 (2 (3))))
 
 (0 (1 (2 (3 (4)))))
