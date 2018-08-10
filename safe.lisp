@@ -159,13 +159,15 @@
 (deftclass space-packet
   header
   filename
+  header-position
   user-data-position)
 
 (defparameter *headers*
  (with-open-binary-file (in *fn* :direction :input)
    (let ((n (file-length in)))
      (loop while (< (file-position in) n) collect 
-	  (let* ((header (read-binary 'space-packet1 in)))
+	  (let* ((current-header-position (file-position in))
+		 (header (read-binary 'space-packet1 in)))
 	    (with-slots (data-length) header
 	      (let* ((pdl data-length)
 		     (len-sh 62)
@@ -174,6 +176,7 @@
 		(file-position in (+ current-user-data-position len-ud))
 		(make-space-packet :header header
 				   :filename *fn*
+				   :header-position current-header-position
 				   :user-data-position current-user-data-position))))))))
 
 
@@ -190,80 +193,32 @@
     (format s "~{~a~^,~}~%"
 	    vals)))
 
-(with-open-file (s "/dev/shm/headers.csv" :direction :output)
-  (csv-header (elt *headers* 0) s)
+(with-open-file (s "/dev/shm/headers.csv" :direction :output
+		   :if-exists :supersede)
+  (csv-header (slot-value (elt *headers* 0) 'header) s)
   (loop for e in *headers* do
-       (csv-line e s)))
+       (csv-line (slot-value e 'header) s)))
 
-(defmethod get-user-data ((o space-packet1) fn)
-  (with-open-binary-file (in fn :direction :input)
-  (let* ((file-size (file-length in))
-	 (header (read-binary 'space-packet1 in)))
-    (with-slots (data-length) header
-      (let* ((pdl data-length)
-	     (len-sh 62)
-	     (len-ud (+ pdl (- len-sh) 1)))
-	(file-position in (+ (file-position in) len-ud))
-	(let ((header1 (read-binary 'space-packet1 in)))
-	  (list (file-position in) len-ud data-length header header1)))))))
+(defmethod get-user-data ((o space-packet))
+  (with-slots (filename user-data-position) o
+   (with-open-file (in filename :direction :input :element-type '(unsigned-byte 8))
+     (let* ((file-size (file-length in)))
+       (file-position in user-data-position)
+       (read-byte in)))))
 
+(dotimes (i 12)
+ (format t "~8b~%" (get-user-data (elt *headers* i))))
 
- ;; #S(SPACE-PACKET1
- ;;   :PACKET-VERSION-NUMBER 0
- ;;   :PACKET-TYPE 0
- ;;   :SECONDARY-HEADER-FLAG 1
- ;;   :APPLICATION-PROCESS-ID-PROCESS-ID 65
- ;;   :APPLICATION-PROCESS-ID-PACKET-CATEGORY 12
- ;;   :SEQUENCE-FLAGS 3
- ;;   :SEQUENCE-COUNT 3780
- ;;   :DATA-LENGTH 15309
- ;;   :COARSE-TIME 1217599483
- ;;   :FINE-TIME 15700
- ;;   :SYNC-MARKER 892270675
- ;;   :DATA-TAKE-ID 84288864
- ;;   :ECC-NUMBER INTERFEROMETRIC-WIDE-SWATH
- ;;   :IGNORE-0 0
- ;;   :TEST-MODE 0
- ;;   :RX-CHANNEL-ID 1
- ;;   :INSTRUMENT-CONFIGURATION-ID 6
- ;;   :SUB-COMMUTATED-INDEX 33
- ;;   :SUB-COMMUTATED-DATA 47723
- ;;   :SPACE-PACKET-COUNT 200388
- ;;   :PRI-COUNT 203239
- ;;   :ERROR-FLAG 0
- ;;   :IGNORE-1 0
- ;;   :BAQ-MODE 12
- ;;   :BAQ-BLOCK-LENGTH 31
- ;;   :IGNORE-2 0
- ;;   :RANGE-DECIMATION 8
- ;;   :RX-GAIN 8
- ;;   :TX-RAMP-RATE-POLARITY 1
- ;;   :TX-RAMP-RATE-MAGNITUDE 1605
- ;;   :TX-PULSE-START-FREQUENCY-POLARITY 0
- ;;   :TX-PULSE-START-FREQUENCY-MAGNITUDE 12335
- ;;   :TX-PULSE-LENGTH 1967
- ;;   :IGNORE-3 0
- ;;   :RANK 9
- ;;   :PULSE-REPETITION-INTERVALL 21859
- ;;   :SAMPLING-WINDOW-START-TIME 6239
- ;;   :SAMPLING-WINDOW-LENGTH 13728
- ;;   :SAB-SSB-CALIBRATION-P 0
- ;;   :SAB-SSB-POLARISATION 1
- ;;   :SAB-SSB-TEMP-COMP 0
- ;;   :SAB-SSB-IGNORE-0 0
- ;;   :SAB-SSB-ELEVATION-BEAM-ADDRESS 6
- ;;   :SAB-SSB-IGNORE-1 0
- ;;   :SAB-SSB-AZIMUTH-BEAM-ADDRESS 245
- ;;   :SES-SSB-CAL-MODE 0
- ;;   :SES-SSB-IGNORE-0 0
- ;;   :SES-SSB-TX-PULSE-NUMBER 6
- ;;   :SES-SSB-SIGNAL-TYPE 0
- ;;   :SES-SSB-IGNORE-1 0
- ;;   :SES-SSB-SWAP 1
- ;;   :SES*-SSB-SWATH-NUMBER 10)
+  ;;  11101
+  ;; 110011
+  ;;      1
+  ;;    111
+  ;;     10
+  ;;  11000
+  ;;   1011
 
-(defparameter *f*
- (open *fn* :direction :input :element-type '(unsigned-byte 8)))
+1
+
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
 ;; measurement data component binary file
