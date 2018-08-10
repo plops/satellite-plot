@@ -206,16 +206,35 @@
        (file-position in user-data-position)
        (read-byte in)))))
 
-(dotimes (i 12)
- (format t "~8b~%" (get-user-data (elt *headers* i))))
+(defmethod get-user-data-bit ((o space-packet) n)
+  (with-slots (filename user-data-position) o
+   (with-open-file (in filename :direction :input :element-type '(unsigned-byte 8))
+     (let* ((file-size (file-length in)))
+       (multiple-value-bind (byte-nr bit-nr) (floor n 8)
+	 (file-position in (+ user-data-position byte-nr))
+	 (ldb (byte 1 bit-nr) (read-byte in)))))))
 
-  ;;  11101
-  ;; 110011
-  ;;      1
-  ;;    111
-  ;;     10
-  ;;  11000
-  ;;   1011
+(0 (1 (2 (3))))
+
+(0 (1 (2 (3 (4)))))
+
+(0 (1 (2 (3 (4 (5 (6)))))))
+
+((0 1) (2 (3 (4 (5 (6 (7 (8 (9)))))))))
+
+()
+
+(dotimes (i 3)
+  (format t "~{~d~}~%" (loop for j below 3 collect
+			    (get-user-data-bit (elt *headers* i) j))))
+
+;;  11101
+;; 110011
+;;      1
+;;    111
+;;     10
+;;  11000
+;;   1011
 
 1
 
