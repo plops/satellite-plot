@@ -2,9 +2,10 @@
 ;; $ git clone https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary
 
 (ql:quickload :lisp-binary)
+(ql:quickload :structy-defclass)
 
 (defpackage :g
-  (:use :cl :lisp-binary))
+  (:use :cl :lisp-binary :structy-defclass))
 
 (in-package :g)
 
@@ -143,6 +144,7 @@
   (ignore-4 0 :type 8)
   )
 
+
 (with-open-binary-file (in *fn* :direction :input)
   (let* ((file-size (file-length in))
 	 (header (read-binary 'space-packet1 in)))
@@ -154,6 +156,11 @@
 	(let ((header1 (read-binary 'space-packet1 in)))
 	  (list (file-position in) len-ud data-length header header1))))))
 
+(deftclass space-packet
+  header
+  filename
+  user-data-position)
+
 (defparameter *headers*
  (with-open-binary-file (in *fn* :direction :input)
    (let ((n (file-length in)))
@@ -162,9 +169,12 @@
 	    (with-slots (data-length) header
 	      (let* ((pdl data-length)
 		     (len-sh 62)
-		     (len-ud (+ pdl (- len-sh) 1)))
-		(file-position in (+ (file-position in) len-ud))
-		header)))))))
+		     (len-ud (+ pdl (- len-sh) 1))
+		     (current-user-data-position (file-position in)))
+		(file-position in (+ current-user-data-position len-ud))
+		(make-space-packet :header header
+				   :filename *fn*
+				   :user-data-position current-user-data-position))))))))
 
 
 (defmethod csv-header ((o space-packet1) s)
@@ -184,6 +194,18 @@
   (csv-header (elt *headers* 0) s)
   (loop for e in *headers* do
        (csv-line e s)))
+
+(defmethod get-user-data ((o space-packet1) fn)
+  (with-open-binary-file (in fn :direction :input)
+  (let* ((file-size (file-length in))
+	 (header (read-binary 'space-packet1 in)))
+    (with-slots (data-length) header
+      (let* ((pdl data-length)
+	     (len-sh 62)
+	     (len-ud (+ pdl (- len-sh) 1)))
+	(file-position in (+ (file-position in) len-ud))
+	(let ((header1 (read-binary 'space-packet1 in)))
+	  (list (file-position in) len-ud data-length header header1)))))))
 
 
  ;; #S(SPACE-PACKET1
