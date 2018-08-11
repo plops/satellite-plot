@@ -214,16 +214,28 @@
 	 (file-position in (+ user-data-position byte-nr))
 	 (ldb (byte 1 bit-nr) (read-byte in)))))))
 
-(defmacro gen-huffman-decoder (huffman-tree)
+(defmacro gen-huffman-decoder (name huffman-tree)
+  "given a huffman tree generate a state machine that reads a symbol
+dependent number of consecutive bits using the function next-bit-fun
+and returns one decoded symbol."
   (labels ((frob (tree)
-	   (if (listp tree)
-	       `(if (next-bit)
-		    ,(frob (car tree))
-		    ,(frob (cdr tree)))
-	       tree)))
-    (frob huffman-tree)))
+	     (cond ((null tree)
+		    (error "null"))
+		   ((atom tree) tree)
+		   ((null (cdr tree))
+		    (car tree))
+		   (t `(if (not (funcall next-bit-fun))
+			   ,(frob (car tree))
+			   ,(frob (cadr tree))
+			   
+			   )))))
+    `(defun ,(intern (format nil "DECODE-~a" name))
+	 (next-bit-fun) ,(frob huffman-tree))
+    ))
 
-(gen-huffman-decoder (0 (1 (2 (3)))))
+(gen-huffman-decoder brc0 (0 (1 (2 (3)))))
+
+(cdr (cadr (cadr (cadr '(0 (1 (2 (3))))))))
 
 (0 (1 (2 (3))))
 
