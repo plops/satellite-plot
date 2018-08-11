@@ -63,14 +63,6 @@
   Noise-Characterisation-IWS
   Noise-Characterisation-Wave)
 
-;; p21
-#+nil
-(define-enum test-mode-type 1 ()
-	     (default 0)
-	     (contingency-operational-test #b100)
-	     (contingency-bypass-test #b101)
-	     (oper #b110)
-	     (bypass #b111))
 (defbinary space-packet1 (:byte-order :big-endian)
   ;; start of packet primary header
   (packet-version-number 0 :type 3)
@@ -230,34 +222,24 @@ and returns one decoded symbol."
 			   
 			   )))))
     `(defun ,(intern (format nil "DECODE-~a" name))
-	 (next-bit-fun) ,(frob huffman-tree))
-    ))
+	 (next-bit-fun) ,(frob huffman-tree))))
 
-(gen-huffman-decoder brc0 (0 (1 (2 (3)))))
+(gen-huffman-decoder brc0 (0 (1 (2 (3))))) ;; page 71 in space packet protocol data unit
+(gen-huffman-decoder brc1 (0 (1 (2 (3 (4))))))
+(gen-huffman-decoder brc2 (0 (1 (2 (3 (4 (5 (6))))))))
+(gen-huffman-decoder brc3 ((0 1) (2 (3 (4 (5 (6 (7 (8 (9))))))))))
+(gen-huffman-decoder brc4 ((0 (1 2)) ((3 4) ((5 6) (7 (8 (9 ((10 11) ((12 13) (14 15))))))))))
 
-(cdr (cadr (cadr (cadr '(0 (1 (2 (3))))))))
+(dotimes (i 5)
+  (let ((v (let ((a 0))
+	     (loop for j below 3 do
+		  (setf (ldb (byte 1 j) a)
+			(get-user-data-bit (elt *headers* i) j)))
+	     a)))
+    (format t "~d ~d ~3,'0b~%"
+	    i v v
+	    )))
 
-(0 (1 (2 (3))))
-
-(0 (1 (2 (3 (4)))))
-
-(0 (1 (2 (3 (4 (5 (6)))))))
-
-((0 1) (2 (3 (4 (5 (6 (7 (8 (9)))))))))
-
-((0 (1 2)) ((3 4) ((5 6) (7 (8 (9 ((10 11) ((12 13) (14 15)))))))))
-
-(dotimes (i 3)
-  (format t "~{~d~}~%" (loop for j below 3 collect
-			    (get-user-data-bit (elt *headers* i) j))))
-
-;;  11101
-;; 110011
-;;      1
-;;    111
-;;     10
-;;  11000
-;;   1011
 
 1
 
