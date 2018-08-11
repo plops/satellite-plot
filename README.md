@@ -217,3 +217,11 @@ GPSR) or “HK” (for HKTM);
 Sta ndard, SAR L0 Cal, SAR L0 Noise and SAR L0 Annotations
 respectively);
 
+
+# Documentation updates
+
+- seem to be posted here: https://www.researchgate.net/project/Sentinel-1-Mission-Performance-Centre
+- recent document: https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Product-Specification
+  - 6.3.1.4 doppler centroid dataset record. can i use this to decode azimuth?
+  - 6.2.3 swath merging. this looks very difficult
+- orbit ephemerides on http://aux.sentinel1.eo.esa.int/ 20 days after acquisition
