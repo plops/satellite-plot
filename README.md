@@ -217,6 +217,8 @@ GPSR) or “HK” (for HKTM);
 Sta ndard, SAR L0 Cal, SAR L0 Noise and SAR L0 Annotations
 respectively);
 
+- radar focusing seems to be documented here: https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Level-1-Detailed-Algorithm-Definition
+
 
 # Documentation updates
 
@@ -225,3 +227,4 @@ respectively);
   - 6.3.1.4 doppler centroid dataset record. can i use this to decode azimuth?
   - 6.2.3 swath merging. this looks very difficult
 - orbit ephemerides on http://aux.sentinel1.eo.esa.int/ 20 days after acquisition
+
