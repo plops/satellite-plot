@@ -230,13 +230,13 @@ and returns one decoded symbol."
 (gen-huffman-decoder brc3 ((0 1) (2 (3 (4 (5 (6 (7 (8 (9))))))))))
 (gen-huffman-decoder brc4 ((0 (1 2)) ((3 4) ((5 6) (7 (8 (9 ((10 11) ((12 13) (14 15))))))))))
 
-(dotimes (i 5)
+(dotimes (i 23)
   (let ((v (let ((a 0))
-	     (loop for j below 3 do
+	     (loop for j below 16 do
 		  (setf (ldb (byte 1 j) a)
 			(get-user-data-bit (elt *headers* i) j)))
 	     a)))
-    (format t "~d ~d ~3,'0b~%"
+    (format t "~2,'0d ~5,'0d ~16,'0b~%"
 	    i v v
 	    )))
 
