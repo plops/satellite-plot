@@ -231,6 +231,27 @@ and returns one decoded symbol."
 (gen-huffman-decoder brc3 ((0 1) (2 (3 (4 (5 (6 (7 (8 (9))))))))))
 (gen-huffman-decoder brc4 ((0 (1 2)) ((3 4) ((5 6) (7 (8 (9 ((10 11) ((12 13) (14 15))))))))))
 
+
+(defparameter *decoder* '(decode-brc0
+			  decode-brc1
+			  decode-brc2
+			  decode-brc3
+			  decode-brc4))
+
+(defmethod get-brc ((o space-packet))
+  (loop for j below 3 sum
+       (* (expt 2 (- 2 j)) (get-user-data-bit o j))))
+
+(let* ((pkg (elt *headers* 0))
+      (current-bit 3)
+      (dec (elt *decoder* (get-brc pkg))))
+  (flet ((next-bit ()
+	   (prog1
+	       (= 1 (get-user-data-bit pkg current-bit))
+	     (incf current-bit))))
+    (loop for i below 10 collect
+	 (funcall dec #'next-bit))))
+
 (dotimes (i 23)
   (let ((v (let ((a 0))
 	     (loop for j below 16 do
@@ -242,6 +263,7 @@ and returns one decoded symbol."
 	    (loop for j below 4 collect
 		 (get-user-data-bit (elt *headers* i) j))
 	    )))
+
 1
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
