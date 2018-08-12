@@ -242,15 +242,19 @@ and returns one decoded symbol."
   (loop for j below 3 sum
        (* (expt 2 (- 2 j)) (get-user-data-bit o j))))
 
-(let* ((pkg (elt *headers* 0))
-      (current-bit 3)
-      (dec (elt *decoder* (get-brc pkg))))
-  (flet ((next-bit ()
-	   (prog1
-	       (= 1 (get-user-data-bit pkg current-bit))
-	     (incf current-bit))))
-    (loop for i below 10 collect
-	 (funcall dec #'next-bit))))
+(defparameter *quads*
+ (let* ((pkg (elt *headers* 0))
+	(current-bit 3)
+	(dec (elt *decoder* (get-brc pkg))))
+   (with-slots (number-of-quads) (slot-value pkg 'header)
+     (flet ((next-bit ()
+	      (prog1
+		  (= 1 (get-user-data-bit pkg current-bit))
+		(incf current-bit))))
+       (loop for i below number-of-quads collect
+	    (funcall dec #'next-bit))))))
+
+
 
 (dotimes (i 23)
   (let ((v (let ((a 0))
