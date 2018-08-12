@@ -12,6 +12,7 @@
 (defparameter *fn* (elt (directory "/dev/shm/S*/*-??????.dat") 0))
 ;; https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary/wiki/DEFBINARY
 
+(/ 3840 4)
 
 ;; https://sentinel.esa.int/documents/247904/685163/Sentinel-1-SAR-Space-Packet-Protocol-Data-Unit.pdf
 
@@ -236,8 +237,10 @@ and returns one decoded symbol."
 		  (setf (ldb (byte 1 j) a)
 			(get-user-data-bit (elt *headers* i) j)))
 	     a)))
-    (format t "~2,'0d ~5,'0d ~16,'0b  ~8,'0b ~8,'0b ~%"
+    (format t "~2,'0d ~5,'0d 16:~16,'0b  8:~8,'0b ~8,'0b l:~{~a~} ~%"
 	    i v v (ldb (byte 8 8) v) (ldb (byte 8 0) v)
+	    (loop for j below 8 collect
+		 (get-user-data-bit (elt *headers* i) j))
 	    )))
 
 ;; 00 42525 1010011000011101  10100110 00011101 
