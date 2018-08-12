@@ -205,7 +205,7 @@
      (let* ((file-size (file-length in)))
        (multiple-value-bind (byte-nr bit-nr) (floor n 8)
 	 (file-position in (+ user-data-position byte-nr))
-	 (ldb (byte 1 bit-nr) (read-byte in)))))))
+	 (ldb (byte 1 (- 7 bit-nr)) (read-byte in)))))))
 
 (defmacro gen-huffman-decoder (name huffman-tree)
   "given a huffman tree generate a state machine that reads a symbol
@@ -239,7 +239,7 @@ and returns one decoded symbol."
 	     a)))
     (format t "~2,'0d ~5,'0d 16:~16,'0b  8:~8,'0b ~8,'0b l:~{~a~} ~%"
 	    i v v (ldb (byte 8 8) v) (ldb (byte 8 0) v)
-	    (loop for j below 8 collect
+	    (loop for j below 4 collect
 		 (get-user-data-bit (elt *headers* i) j))
 	    )))
 1
