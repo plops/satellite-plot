@@ -264,8 +264,9 @@ and returns one decoded symbol."
 ;; 21 37144 1001000100011000  10010001 00011000 
 ;; 22 47112 1011100000001000  10111000 00001000 
 ;;                            AAA  BBB CCC  DDD
-;; brc can be 0..4, i.e the third bit is always 0
 ;; i'm not sure about the bit numbers. is the data stored as 16bit MSB first?
+;; brc can be 0..4, i.e the third bit is always 0
+;; only columns CCC sreem  to fulfill this criterium
 
 1
 
