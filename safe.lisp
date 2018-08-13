@@ -242,6 +242,11 @@ and returns one decoded symbol."
   (loop for j below 3 sum
        (* (expt 2 (- 2 j)) (get-user-data-bit o j))))
 
+;; 3 bits followed by 128 hcodes
+;; 3 bits ...
+;; repeats until number-of-quads hcodes were sent
+;; padding until the last 16bit
+
 (defparameter *quads*
  (let* ((pkg (elt *headers* 0))
 	(current-bit 3)
@@ -251,7 +256,7 @@ and returns one decoded symbol."
 	      (prog1
 		  (= 1 (get-user-data-bit pkg current-bit))
 		(incf current-bit))))
-       (loop for i below number-of-quads collect
+       (loop for i below 128 collect
 	    (funcall dec #'next-bit))))))
 
 
