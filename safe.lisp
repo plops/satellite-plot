@@ -271,7 +271,8 @@ and returns one decoded symbol."
 	    (loop while (< decoded-symbols number-of-quads) collect
 	     (let* ((current-brc (get-brc))
 		    (dec (elt *decoder* current-brc)))
-	       (format t "~a~%" (list :brc current-brc :16bit-word-and-rest
+
+	       (format t "~a~%" (list :start :brc current-brc :16bit-word-and-rest
 				      (multiple-value-list (floor current-bit 16))))
 	       (loop for i below 128 collect
 		    (progn
@@ -279,7 +280,14 @@ and returns one decoded symbol."
 		      (* (if (= 0 (next-bit)) 
 			     -1
 			     1)
-			 (funcall dec #'next-bit))))))))))))
+			 (funcall dec #'next-bit))))
+	       (format t "~a~%" (list :end :brc current-brc :16bit-word-and-rest
+				      (multiple-value-list (floor current-bit 16))))))
+	    (dotimes (i (- 16 (mod current-bit 16)))
+	      ;; consume padding bits until next 16bit word boundary
+	      (next-bit))
+	    (format t "~a~%" (list :end-all :16bit-word-and-rest
+				      (multiple-value-list (floor current-bit 16))))))))))
 
 
 
