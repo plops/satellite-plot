@@ -258,6 +258,7 @@ and returns one decoded symbol."
   (let* ((pkg (elt *headers* 0))
 	 (current-bit 0)
 	 (brc-list ())
+	 (thidx-list ())
 	 (verbose t))
     (with-slots (number-of-quads) (slot-value pkg 'header)
       (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
@@ -269,6 +270,9 @@ and returns one decoded symbol."
 		 (get-brc ()
 		   (loop for j below 3 sum
 			(* (expt 2 (- 2 j)) (next-bit))))
+		 (get-thidx ()
+		   (loop for j below 8 sum
+			(* (expt 2 (- 7 j)) (next-bit))))
 		 (consume-padding-bits ()
 		   (let ((pad (- 16 (mod current-bit 16))))
 		     (dotimes (i pad)
@@ -336,6 +340,41 @@ and returns one decoded symbol."
 		     (consume-padding-bits)
 		     (when verbose
 		       (format t "~a~%" (list :io-end-all 
+					      :16bit-word-and-rest
+					      (multiple-value-list (floor current-bit 16))))))))
+		(qe-symbols
+		 (let ((decoded-symbols 0))
+		   (prog1
+		       (loop for block from 0 while (< decoded-symbols number-of-quads) collect
+			    (let* ((current-brc (elt brc-list block))
+				   (current-thidx (get-thidx))
+				   (dec (elt *decoder* current-brc)))
+			      (push current-thidx thidx-list)
+			      (when verbose
+				(format t "~a~%" (list :qe-start-block :brc current-brc
+						       :block block
+						       :thidx current-thidx
+						       :quad decoded-symbols
+						       :16bit-word-and-rest
+						       (multiple-value-list (floor current-bit 16)))))
+			      (prog1
+				  (loop for i below 128 while (< decoded-symbols number-of-quads) collect
+				       (prog1
+		      			   (* (if (= 0 (next-bit)) 
+						  -1
+						  1)
+					      (funcall dec #'next-bit))
+					 (incf decoded-symbols)))
+				(when verbose
+				  (format t "~a~%" (list :qe-end-block :brc current-brc
+							 :block block
+							 :thidx current-thidx
+							 :quad decoded-symbols
+							 :16bit-word-and-rest
+							 (multiple-value-list (floor current-bit 16))))))))
+		     (consume-padding-bits)
+		     (when verbose
+		       (format t "~a~%" (list :qe-end-all 
 					      :16bit-word-and-rest
 					      (multiple-value-list (floor current-bit 16)))))))))))))))
 
