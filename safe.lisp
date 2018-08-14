@@ -12,8 +12,6 @@
 (defparameter *fn* (elt (directory "/dev/shm/S*/*-??????.dat") 0))
 ;; https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary/wiki/DEFBINARY
 
-(/ 3840 4)
-
 ;; https://sentinel.esa.int/documents/247904/685163/Sentinel-1-SAR-Space-Packet-Protocol-Data-Unit.pdf
 
 (define-enum ecc-number-type 1 ()
@@ -217,7 +215,7 @@ and returns one decoded symbol."
 		   ((atom tree) tree)
 		   ((null (cdr tree))
 		    (car tree))
-		   (t `(if (not (funcall next-bit-fun))
+		   (t `(if (= 0 (funcall next-bit-fun))
 			   ,(frob (car tree))
 			   ,(frob (cadr tree))
 			   
@@ -258,22 +256,30 @@ and returns one decoded symbol."
 
 (defparameter *quads*
   (let* ((pkg (elt *headers* 0))
-	 (current-bit 3)
-	 (current-brc (get-brc pkg))
-	 (dec (elt *decoder* current-brc)))
+	 (current-bit 0))
     (with-slots (number-of-quads) (slot-value pkg 'header)
       (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
 					   256)))
-	(flet ((next-bit ()
-		 (prog1
-		     (= 1 (get-user-data-bit pkg current-bit))
-		   (incf current-bit))))
-	  (loop for i below 128 collect
-	       (let ((sign (next-bit)))
-		 (* (if sign
-			-1
-			1)
-		    (funcall dec #'next-bit)))))))))
+	(labels ((next-bit ()
+		   (prog1
+		       (get-user-data-bit pkg current-bit)
+		     (incf current-bit)))
+		 (get-brc ()
+		   (loop for j below 3 sum
+			(* (expt 2 (- 2 j)) (next-bit)))))
+	  (let ((decoded-symbols 0))
+	    (loop while (< decoded-symbols number-of-quads) collect
+	     (let* ((current-brc (get-brc))
+		    (dec (elt *decoder* current-brc)))
+	       (format t "~a~%" (list :brc current-brc :16bit-word-and-rest
+				      (multiple-value-list (floor current-bit 16))))
+	       (loop for i below 128 collect
+		    (progn
+		      (incf decoded-symbols)
+		      (* (if (= 0 (next-bit)) 
+			     -1
+			     1)
+			 (funcall dec #'next-bit))))))))))))
 
 
 
