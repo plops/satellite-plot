@@ -246,6 +246,7 @@ and returns one decoded symbol."
 ;; 3 bits ...
 ;; repeats until number-of-quads hcodes were sent
 ;; padding until the last 16bit
+;; don't forget the sign bits
 
 (defparameter *quads*
  (let* ((pkg (elt *headers* 0))
