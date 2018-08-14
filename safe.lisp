@@ -407,7 +407,13 @@ and returns one decoded symbol."
 		     (when verbose
 		       (format t "~a~%" (list :qo-end-all 
 					      :16bit-word-and-rest
-					      (multiple-value-list (floor current-bit 16)))))))))))))))
+					      (multiple-value-list (floor current-bit 16))))))))
+		)
+	    (list ie-symbols
+		  io-symbols
+		  qe-symbols
+		  qo-symbols
+		  )))))))
 
 
 
