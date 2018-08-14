@@ -272,22 +272,29 @@ and returns one decoded symbol."
 	     (let* ((current-brc (get-brc))
 		    (dec (elt *decoder* current-brc)))
 
-	       (format t "~a~%" (list :start :brc current-brc :16bit-word-and-rest
+	       (format t "~a~%" (list :start :brc current-brc
+				      :quad decoded-symbols
+				      :16bit-word-and-rest
 				      (multiple-value-list (floor current-bit 16))))
-	       (loop for i below 128 collect
-		    (progn
-		      (incf decoded-symbols)
-		      (* (if (= 0 (next-bit)) 
+	       (loop for i below 128 while (< decoded-symbols number-of-quads) collect
+		    (prog1
+		      	(* (if (= 0 (next-bit)) 
 			     -1
 			     1)
-			 (funcall dec #'next-bit))))
-	       (format t "~a~%" (list :end :brc current-brc :16bit-word-and-rest
+			 (funcall dec #'next-bit))
+		      (incf decoded-symbols)))
+	       (format t "~a~%" (list :end :brc current-brc
+				      :quad decoded-symbols
+				      :16bit-word-and-rest
 				      (multiple-value-list (floor current-bit 16))))))
-	    (dotimes (i (- 16 (mod current-bit 16)))
-	      ;; consume padding bits until next 16bit word boundary
-	      (next-bit))
-	    (format t "~a~%" (list :end-all :16bit-word-and-rest
-				      (multiple-value-list (floor current-bit 16))))))))))
+	    (let ((pad (- 16 (mod current-bit 16))))
+	      (dotimes (i pad)
+	       ;; consume padding bits until next 16bit word boundary
+		(next-bit))
+	      (format t "~a~%" (list :end-all :pad pad
+				     :16bit-word-and-rest
+				      (multiple-value-list (floor current-bit 16)))))
+	    ))))))
 
 
 
