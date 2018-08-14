@@ -251,14 +251,21 @@ and returns one decoded symbol."
 (defparameter *quads*
  (let* ((pkg (elt *headers* 0))
 	(current-bit 3)
-	(dec (elt *decoder* (get-brc pkg))))
+	(current-brc (get-brc pkg))
+	(dec (elt *decoder* current-brc)))
    (with-slots (number-of-quads) (slot-value pkg 'header)
-     (flet ((next-bit ()
-	      (prog1
-		  (= 1 (get-user-data-bit pkg current-bit))
-		(incf current-bit))))
-       (loop for i below 128 collect
-	    (funcall dec #'next-bit))))))
+     (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
+					  256)))
+      (flet ((next-bit ()
+	       (prog1
+		   (= 1 (get-user-data-bit pkg current-bit))
+		 (incf current-bit))))
+	(loop for i below 128 collect
+	     (let ((sign (next-bit)))
+	       (* (if sign
+		      -1
+		      1)
+		  (funcall dec #'next-bit)))))))))
 
 
 
