@@ -376,6 +376,37 @@ and returns one decoded symbol."
 		     (when verbose
 		       (format t "~a~%" (list :qe-end-all 
 					      :16bit-word-and-rest
+					      (multiple-value-list (floor current-bit 16))))))))
+		(qo-symbols
+		 (let ((decoded-symbols 0))
+		   (prog1
+		       (loop for block from 0 while (< decoded-symbols number-of-quads) collect
+			    (let* ((current-brc (elt brc-list block))
+				   (dec (elt *decoder* current-brc)))
+			      (when verbose
+				(format t "~a~%" (list :qo-start-block :brc current-brc
+						       :block block
+						       :quad decoded-symbols
+						       :16bit-word-and-rest
+						       (multiple-value-list (floor current-bit 16)))))
+			      (prog1
+				  (loop for i below 128 while (< decoded-symbols number-of-quads) collect
+				       (prog1
+		      			   (* (if (= 0 (next-bit)) 
+						  -1
+						  1)
+					      (funcall dec #'next-bit))
+					 (incf decoded-symbols)))
+				(when verbose
+				  (format t "~a~%" (list :qo-end-block :brc current-brc
+							 :block block
+							 :quad decoded-symbols
+							 :16bit-word-and-rest
+							 (multiple-value-list (floor current-bit 16))))))))
+		     (consume-padding-bits)
+		     (when verbose
+		       (format t "~a~%" (list :qo-end-all 
+					      :16bit-word-and-rest
 					      (multiple-value-list (floor current-bit 16)))))))))))))))
 
 
