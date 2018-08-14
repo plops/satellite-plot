@@ -242,6 +242,14 @@ and returns one decoded symbol."
   (loop for j below 3 sum
        (* (expt 2 (- 2 j)) (get-user-data-bit o j))))
 
+;; flexible dynamic block adaptive quantization (fdbaq)
+;; Guccione Sentinel-1 FDBAQ Performances (2012) 10.1109/TyWRRS.2012.6381096
+;; quantization follows thermal snr of block
+;; more quality is assigned for the best targets (based on antenna input power)
+
+;; on-ground the optimal quantizers and rate selection thresholds are
+;; selected by predicting system performance for specific missions
+
 ;; 3 bits followed by 128 hcodes
 ;; 3 bits ...
 ;; repeats until number-of-quads hcodes were sent
@@ -249,23 +257,23 @@ and returns one decoded symbol."
 ;; don't forget the sign bits
 
 (defparameter *quads*
- (let* ((pkg (elt *headers* 0))
-	(current-bit 3)
-	(current-brc (get-brc pkg))
-	(dec (elt *decoder* current-brc)))
-   (with-slots (number-of-quads) (slot-value pkg 'header)
-     (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
-					  256)))
-      (flet ((next-bit ()
-	       (prog1
-		   (= 1 (get-user-data-bit pkg current-bit))
-		 (incf current-bit))))
-	(loop for i below 128 collect
-	     (let ((sign (next-bit)))
-	       (* (if sign
-		      -1
-		      1)
-		  (funcall dec #'next-bit)))))))))
+  (let* ((pkg (elt *headers* 0))
+	 (current-bit 3)
+	 (current-brc (get-brc pkg))
+	 (dec (elt *decoder* current-brc)))
+    (with-slots (number-of-quads) (slot-value pkg 'header)
+      (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
+					   256)))
+	(flet ((next-bit ()
+		 (prog1
+		     (= 1 (get-user-data-bit pkg current-bit))
+		   (incf current-bit))))
+	  (loop for i below 128 collect
+	       (let ((sign (next-bit)))
+		 (* (if sign
+			-1
+			1)
+		    (funcall dec #'next-bit)))))))))
 
 
 
