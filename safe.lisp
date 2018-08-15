@@ -409,6 +409,7 @@ and returns one decoded symbol."
 					      :16bit-word-and-rest
 					      (multiple-value-list (floor current-bit 16))
 					      :8bit-word (floor current-bit 8)
+					      :remaining-user-data-bits (+ (- (* 8 data-length) current-bit) (- (* 8 62))  (* 8 1))
 					      :data-length data-length))))))
 		)
 	    (list ie-symbols
@@ -417,7 +418,6 @@ and returns one decoded symbol."
 		  qo-symbols
 		  )))))))
 
-(- 15309 15238)
 
 (dotimes (i 23)
   (let ((v (let ((a 0))
