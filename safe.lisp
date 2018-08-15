@@ -413,7 +413,10 @@ and returns one decoded symbol."
 					      :16bit-word-and-rest
 					      (multiple-value-list (floor current-bit 16))
 					      :8bit-word (floor current-bit 8)
-					      :remaining-user-data-bits (+ (- (* 8 data-length) current-bit) (- (* 8 62))  (* 8 1))
+					      ;; current-bit counts from the beginning of the variable length 'user data field'
+					      ;; data-length contains additional an 62 octets of the secondary packet header
+					      ;; data-length-62+1 is the number of octets in the variable length 'user data field'
+					      :remaining-user-data-bits (- (* 8 (+ data-length 1 -62)) current-bit)
 					      :data-length data-length))))))
 		)
 	    (list ie-symbols
