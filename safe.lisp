@@ -71,9 +71,11 @@
   (application-process-id-packet-category 0 :type 4) 
   (sequence-flags 0 :type 2)
   (sequence-count 0 :type 14) ;; 0 at start of measurement, wraps after 16383
-  (data-length 0 :type 16) ;; number of octets in packet data field - 1
-  ;; start of packet data field
-  ;; datation service p. 15
+  (data-length 0 :type 16) ;; (number of octets in packet data field)
+			   ;; - 1, includes 62 octets of secondary
+			   ;; header and the user data field of
+			   ;; variable length start of packet data
+			   ;; field datation service p. 15
   (coarse-time 0 :type 32)
   (fine-time 0 :type 16)
   ;; fixed ancillary data service
@@ -198,6 +200,8 @@
        (read-byte in)))))
 
 (defmethod get-user-data-bit ((o space-packet) n)
+  "go to the first octet of the user data. then go to the n//8-th byte and return the nth bit "
+  ;; FIXME: this can be optimized, close over the open file
   (with-slots (filename user-data-position) o
    (with-open-file (in filename :direction :input :element-type '(unsigned-byte 8))
      (let* ((file-size (file-length in)))
@@ -253,7 +257,7 @@ and returns one decoded symbol."
 ;; repeats until number-of-quads hcodes were sent
 ;; padding until the last 16bit
 ;; don't forget the sign bits
-
+;; the overall package length (with header) a multiple of 32bit (4 octets p.13)
 (defparameter *quads*
   (let* ((pkg (elt *headers* 0))
 	 (current-bit 0)
