@@ -260,7 +260,7 @@ and returns one decoded symbol."
 	 (brc-list ())
 	 (thidx-list ())
 	 (verbose t))
-    (with-slots (number-of-quads) (slot-value pkg 'header)
+    (with-slots (number-of-quads data-length) (slot-value pkg 'header)
       (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
 					   256)))
 	(labels ((next-bit ()
@@ -407,7 +407,9 @@ and returns one decoded symbol."
 		     (when verbose
 		       (format t "~a~%" (list :qo-end-all 
 					      :16bit-word-and-rest
-					      (multiple-value-list (floor current-bit 16))))))))
+					      (multiple-value-list (floor current-bit 16))
+					      :8bit-word (floor current-bit 8)
+					      :data-length data-length))))))
 		)
 	    (list ie-symbols
 		  io-symbols
@@ -415,7 +417,7 @@ and returns one decoded symbol."
 		  qo-symbols
 		  )))))))
 
-
+(- 15309 15238)
 
 (dotimes (i 23)
   (let ((v (let ((a 0))
