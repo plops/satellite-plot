@@ -198,6 +198,8 @@ https://qc.sentinel1.eo.esa.int/disclaimer/
 - level-0 product specification:
 https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
+  - p65 annotation data component has 26 bytes for each space packet
+
 BB_TTTR_LF
 
 - BB = instrument mode/type of data, possible values “SM”, “EW”, “IW”,
@@ -220,6 +222,7 @@ respectively);
 - radar focusing seems to be documented here: https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Level-1-Detailed-Algorithm-Definition
 
 
+
 # Documentation updates
 
 - seem to be posted here: https://www.researchgate.net/project/Sentinel-1-Mission-Performance-Centre
@@ -227,4 +230,5 @@ respectively);
   - 6.3.1.4 doppler centroid dataset record. can i use this to decode azimuth?
   - 6.2.3 swath merging. this looks very difficult
 - orbit ephemerides on http://aux.sentinel1.eo.esa.int/ 20 days after acquisition
+  - perhaps also calibration pulses?
 
