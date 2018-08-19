@@ -9,7 +9,9 @@
 
 (in-package :g)
 
-(defparameter *fn* (elt (directory "/dev/shm/S*/*-??????.dat") 0))
+;; S1A_IW_RAW__0SSH_20180819T144551_20180819T144623_023316_02892E_DDA9.zip
+;; https://scihub.copernicus.eu/apihub/odata/v1/Products('87b645f0-852a-4b27-ae05-829b09622da5')/$value
+(defparameter *fn* (elt (directory "/home/martin/Downloads/S*/*-??????.dat") 0))
 ;; https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary/wiki/DEFBINARY
 
 ;; https://sentinel.esa.int/documents/247904/685163/Sentinel-1-SAR-Space-Packet-Protocol-Data-Unit.pdf
