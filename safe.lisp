@@ -266,167 +266,175 @@ and returns one decoded symbol."
 	 (brc-list ())
 	 (thidx-list ())
 	 (verbose t))
-    (with-slots (number-of-quads data-length) (slot-value pkg 'header)
-      (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
-					   256)))
-	(labels ((next-bit ()
-		   (prog1
-		       (get-user-data-bit pkg current-bit)
-		     (incf current-bit)))
-		 (get-brc ()
-		   (loop for j below 3 sum
-			(* (expt 2 (- 2 j)) (next-bit))))
-		 (get-thidx ()
-		   (loop for j below 8 sum
-			(* (expt 2 (- 7 j)) (next-bit))))
-		 (consume-padding-bits ()
-		   (let ((pad (- 16 (mod current-bit 16))))
-		     (dotimes (i pad)
-		       ;; consume padding bits until next 16bit word boundary
-		       (next-bit))
-		     (when verbose
-		       (format t "consuming ~a padding bits.~%" pad))
-		     pad)))
-	  (let ((ie-symbols
-		 (let ((decoded-symbols 0))
-		   (prog1
-		       (loop while (< decoded-symbols number-of-quads) collect
-			    (let* ((current-brc (get-brc))
-				   (dec (elt *decoder* current-brc)))
-			      (push current-brc brc-list)
-			      (when verbose
-				(format t "~a~%" (list :ie-start-block :brc current-brc
-						       :quad decoded-symbols
-						       :16bit-word-and-rest
-						       (multiple-value-list (floor current-bit 16)))))
-			      (prog1
-				  (loop for i below 128 while (< decoded-symbols number-of-quads) collect
-				       (prog1
-		      			   (* (if (= 0 (next-bit)) 
-						  -1
-						  1)
-					      (funcall dec #'next-bit))
-					 (incf decoded-symbols)))
-				(when verbose
-				  (format t "~a~%" (list :ie-end-block :brc current-brc
-							 :quad decoded-symbols
-							 :16bit-word-and-rest
-							 (multiple-value-list (floor current-bit 16))))))))
-		     (consume-padding-bits)
-		     (when verbose
-		       (format t "~a~%" (list :ie-end-all 
-					      :16bit-word-and-rest
-					      (multiple-value-list (floor current-bit 16))))))))
-		(io-symbols
-		 (let ((decoded-symbols 0))
-		   (prog1
-		       (loop for block from 0 while (< decoded-symbols number-of-quads) collect
-			    (let* ((current-brc (elt brc-list block))
-				   (dec (elt *decoder* current-brc)))
-			      (when verbose
-				(format t "~a~%" (list :io-start-block :brc current-brc
-						       :block block
-						       :quad decoded-symbols
-						       :16bit-word-and-rest
-						       (multiple-value-list (floor current-bit 16)))))
-			      (prog1
-				  (loop for i below 128 while (< decoded-symbols number-of-quads) collect
-				       (prog1
-		      			   (* (if (= 0 (next-bit)) 
-						  -1
-						  1)
-					      (funcall dec #'next-bit))
-					 (incf decoded-symbols)))
-				(when verbose
-				  (format t "~a~%" (list :io-end-block :brc current-brc
-							 :block block
-							 :quad decoded-symbols
-							 :16bit-word-and-rest
-							 (multiple-value-list (floor current-bit 16))))))))
-		     (consume-padding-bits)
-		     (when verbose
-		       (format t "~a~%" (list :io-end-all 
-					      :16bit-word-and-rest
-					      (multiple-value-list (floor current-bit 16))))))))
-		(qe-symbols
-		 (let ((decoded-symbols 0))
-		   (prog1
-		       (loop for block from 0 while (< decoded-symbols number-of-quads) collect
-			    (let* ((current-brc (elt brc-list block))
-				   (current-thidx (get-thidx))
-				   (dec (elt *decoder* current-brc)))
-			      (push current-thidx thidx-list)
-			      (when verbose
-				(format t "~a~%" (list :qe-start-block :brc current-brc
-						       :block block
-						       :thidx current-thidx
-						       :quad decoded-symbols
-						       :16bit-word-and-rest
-						       (multiple-value-list (floor current-bit 16)))))
-			      (prog1
-				  (loop for i below 128 while (< decoded-symbols number-of-quads) collect
-				       (prog1
-		      			   (* (if (= 0 (next-bit)) 
-						  -1
-						  1)
-					      (funcall dec #'next-bit))
-					 (incf decoded-symbols)))
-				(when verbose
-				  (format t "~a~%" (list :qe-end-block :brc current-brc
-							 :block block
-							 :thidx current-thidx
-							 :quad decoded-symbols
-							 :16bit-word-and-rest
-							 (multiple-value-list (floor current-bit 16))))))))
-		     (consume-padding-bits)
-		     (when verbose
-		       (format t "~a~%" (list :qe-end-all 
-					      :16bit-word-and-rest
-					      (multiple-value-list (floor current-bit 16))))))))
-		(qo-symbols
-		 (let ((decoded-symbols 0))
-		   (prog1
-		       (loop for block from 0 while (< decoded-symbols number-of-quads) collect
-			    (let* ((current-brc (elt brc-list block))
-				   (dec (elt *decoder* current-brc)))
-			      (when verbose
-				(format t "~a~%" (list :qo-start-block :brc current-brc
-						       :block block
-						       :quad decoded-symbols
-						       :16bit-word-and-rest
-						       (multiple-value-list (floor current-bit 16)))))
-			      (prog1
-				  (loop for i below 128 while (< decoded-symbols number-of-quads) collect
-				       (prog1
-		      			   (* (if (= 0 (next-bit)) 
-						  -1
-						  1)
-					      (funcall dec #'next-bit))
-					 (incf decoded-symbols)))
-				(when verbose
-				  (format t "~a~%" (list :qo-end-block :brc current-brc
-							 :block block
-							 :quad decoded-symbols
-							 :16bit-word-and-rest
-							 (multiple-value-list (floor current-bit 16))))))))
-		     (consume-padding-bits)
-		     (when verbose
-		       (format t "~a~%" (list :qo-end-all 
-					      :16bit-word-and-rest
-					      (multiple-value-list (floor current-bit 16))
-					      :8bit-word (floor current-bit 8)
-					      ;; current-bit counts from the beginning of the variable length 'user data field'
-					      ;; data-length contains additional an 62 octets of the secondary packet header
-					      ;; data-length-62+1 is the number of octets in the variable length 'user data field'
-					      :remaining-user-data-bits (- (* 8 (+ data-length 1 -62)) current-bit)
-					      :data-length data-length))))))
-		)
-	    (list ie-symbols
-		  io-symbols
-		  qe-symbols
-		  qo-symbols
-		  )))))))
+    ))
 
+(time (defparameter *quads* (decompress (elt *headers* 0)))) ;; 5.5s
+
+(defmethod decompress ((pkg space-packet) &key (verbose nil))
+  (let* ((pkg (elt *headers* 0))
+	 (current-bit 0)
+	 (brc-list ())
+	 (thidx-list ()))
+   (with-slots (number-of-quads data-length) (slot-value pkg 'header)
+     (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
+					  256)))
+       (labels ((next-bit ()
+		  (prog1
+		      (get-user-data-bit pkg current-bit)
+		    (incf current-bit)))
+		(get-brc ()
+		  (loop for j below 3 sum
+		       (* (expt 2 (- 2 j)) (next-bit))))
+		(get-thidx ()
+		  (loop for j below 8 sum
+		       (* (expt 2 (- 7 j)) (next-bit))))
+		(consume-padding-bits ()
+		  (let ((pad (- 16 (mod current-bit 16))))
+		    (dotimes (i pad)
+		      ;; consume padding bits until next 16bit word boundary
+		      (next-bit))
+		    (when verbose
+		      (format t "consuming ~a padding bits.~%" pad))
+		    pad)))
+	 (let ((ie-symbols
+		(let ((decoded-symbols 0))
+		  (prog1
+		      (loop while (< decoded-symbols number-of-quads) collect
+			   (let* ((current-brc (get-brc))
+				  (dec (elt *decoder* current-brc)))
+			     (push current-brc brc-list)
+			     (when verbose
+			       (format t "~a~%" (list :ie-start-block :brc current-brc
+						      :quad decoded-symbols
+						      :16bit-word-and-rest
+						      (multiple-value-list (floor current-bit 16)))))
+			     (prog1
+				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
+				      (prog1
+		      			  (* (if (= 0 (next-bit)) 
+						 -1
+						 1)
+					     (funcall dec #'next-bit))
+					(incf decoded-symbols)))
+			       (when verbose
+				 (format t "~a~%" (list :ie-end-block :brc current-brc
+							:quad decoded-symbols
+							:16bit-word-and-rest
+							(multiple-value-list (floor current-bit 16))))))))
+		    (consume-padding-bits)
+		    (when verbose
+		      (format t "~a~%" (list :ie-end-all 
+					     :16bit-word-and-rest
+					     (multiple-value-list (floor current-bit 16))))))))
+	       (io-symbols
+		(let ((decoded-symbols 0))
+		  (prog1
+		      (loop for block from 0 while (< decoded-symbols number-of-quads) collect
+			   (let* ((current-brc (elt brc-list block))
+				  (dec (elt *decoder* current-brc)))
+			     (when verbose
+			       (format t "~a~%" (list :io-start-block :brc current-brc
+						      :block block
+						      :quad decoded-symbols
+						      :16bit-word-and-rest
+						      (multiple-value-list (floor current-bit 16)))))
+			     (prog1
+				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
+				      (prog1
+		      			  (* (if (= 0 (next-bit)) 
+						 -1
+						 1)
+					     (funcall dec #'next-bit))
+					(incf decoded-symbols)))
+			       (when verbose
+				 (format t "~a~%" (list :io-end-block :brc current-brc
+							:block block
+							:quad decoded-symbols
+							:16bit-word-and-rest
+							(multiple-value-list (floor current-bit 16))))))))
+		    (consume-padding-bits)
+		    (when verbose
+		      (format t "~a~%" (list :io-end-all 
+					     :16bit-word-and-rest
+					     (multiple-value-list (floor current-bit 16))))))))
+	       (qe-symbols
+		(let ((decoded-symbols 0))
+		  (prog1
+		      (loop for block from 0 while (< decoded-symbols number-of-quads) collect
+			   (let* ((current-brc (elt brc-list block))
+				  (current-thidx (get-thidx))
+				  (dec (elt *decoder* current-brc)))
+			     (push current-thidx thidx-list)
+			     (when verbose
+			       (format t "~a~%" (list :qe-start-block :brc current-brc
+						      :block block
+						      :thidx current-thidx
+						      :quad decoded-symbols
+						      :16bit-word-and-rest
+						      (multiple-value-list (floor current-bit 16)))))
+			     (prog1
+				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
+				      (prog1
+		      			  (* (if (= 0 (next-bit)) 
+						 -1
+						 1)
+					     (funcall dec #'next-bit))
+					(incf decoded-symbols)))
+			       (when verbose
+				 (format t "~a~%" (list :qe-end-block :brc current-brc
+							:block block
+							:thidx current-thidx
+							:quad decoded-symbols
+							:16bit-word-and-rest
+							(multiple-value-list (floor current-bit 16))))))))
+		    (consume-padding-bits)
+		    (when verbose
+		      (format t "~a~%" (list :qe-end-all 
+					     :16bit-word-and-rest
+					     (multiple-value-list (floor current-bit 16))))))))
+	       (qo-symbols
+		(let ((decoded-symbols 0))
+		  (prog1
+		      (loop for block from 0 while (< decoded-symbols number-of-quads) collect
+			   (let* ((current-brc (elt brc-list block))
+				  (dec (elt *decoder* current-brc)))
+			     (when verbose
+			       (format t "~a~%" (list :qo-start-block :brc current-brc
+						      :block block
+						      :quad decoded-symbols
+						      :16bit-word-and-rest
+						      (multiple-value-list (floor current-bit 16)))))
+			     (prog1
+				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
+				      (prog1
+		      			  (* (if (= 0 (next-bit)) 
+						 -1
+						 1)
+					     (funcall dec #'next-bit))
+					(incf decoded-symbols)))
+			       (when verbose
+				 (format t "~a~%" (list :qo-end-block :brc current-brc
+							:block block
+							:quad decoded-symbols
+							:16bit-word-and-rest
+							(multiple-value-list (floor current-bit 16))))))))
+		    (consume-padding-bits)
+		    (when verbose
+		      (format t "~a~%" (list :qo-end-all 
+					     :16bit-word-and-rest
+					     (multiple-value-list (floor current-bit 16))
+					     :8bit-word (floor current-bit 8)
+					     ;; current-bit counts from the beginning of the variable length 'user data field'
+					     ;; data-length contains additional an 62 octets of the secondary packet header
+					     ;; data-length-62+1 is the number of octets in the variable length 'user data field'
+					     :remaining-user-data-bits (- (* 8 (+ data-length 1 -62)) current-bit)
+					     :data-length data-length))))))
+	       )
+	   (list ie-symbols
+		 io-symbols
+		 qe-symbols
+		 qo-symbols
+		 )))))))
 
 (dotimes (i 23)
   (let ((v (let ((a 0))
