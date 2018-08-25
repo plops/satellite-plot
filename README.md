@@ -197,38 +197,48 @@ https://qc.sentinel1.eo.esa.int/disclaimer/
 
 - level-0 product specification:
 https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
-
   - p65 annotation data component has 26 bytes for each space packet
-
 BB_TTTR_LF
-
 - BB = instrument mode/type of data, possible values “SM”, “EW”, “IW”,
 “WV”, “RF”, “EN”, “AN” (for SAR instrument modes Stripmap, Extra Wide
 Swath, Interferometric Wide Swath, Wave, and RF Characterisation Mode
 , Elevation Notch and Azimuth Notch Modes respectively), “GP” (for
 GPSR) or “HK” (for HKTM);
-
-
 - TTT = “RAW” fixed string, indicating RAW L0 Products;
-
 - R = “_” fixed string
-
 - L = “0” fixed string, indicating L0 Processing Level;
-
 - F = Product Class, possible values “S”, “C”, “N” or “A” (for SAR L0
 Sta ndard, SAR L0 Cal, SAR L0 Noise and SAR L0 Annotations
 respectively);
 
-- radar focusing seems to be documented here: https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Level-1-Detailed-Algorithm-Definition
+- radar focusing seems to be documented here:
+  https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Level-1-Detailed-Algorithm-Definition
 
 
 
 # Documentation updates
 
-- seem to be posted here: https://www.researchgate.net/project/Sentinel-1-Mission-Performance-Centre
-- recent document: https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Product-Specification
-  - 6.3.1.4 doppler centroid dataset record. can i use this to decode azimuth?
+- seem to be posted here:
+  https://www.researchgate.net/project/Sentinel-1-Mission-Performance-Centre
+- recent document:
+  https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Product-Specification
+  - 6.3.1.4 doppler centroid dataset record. can i use this to decode
+    azimuth?
   - 6.2.3 swath merging. this looks very difficult
-- orbit ephemerides on http://aux.sentinel1.eo.esa.int/ 20 days after acquisition
+- orbit ephemerides on http://aux.sentinel1.eo.esa.int/ 20 days after
+  acquisition
   - perhaps also calibration pulses?
+
+# ASDF and testing
+
+- https://github.com/fare/asdf/blob/master/doc/best_practices.md
+
+## loading process:
+
+- store directory that is in the source-registry of
+  asdf. ~/common-lisp is a default since asdf 3.1
+- run (asdf:clear-configuration) to update a currently running lisp
+  image
+- call (asdf:load-system "foobar")
+- define tests
 

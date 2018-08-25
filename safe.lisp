@@ -268,7 +268,7 @@ and returns one decoded symbol."
 	 (verbose t))
     ))
 
-(time (defparameter *quads* (decompress (elt *headers* 0)))) ;; 5.5s
+(defparameter *quads* (decompress (elt *headers* 0))) ;; 5.5s
 
 (defmethod decompress ((pkg space-packet) &key (verbose nil))
   (let* ((pkg (elt *headers* 0))
