@@ -241,4 +241,9 @@ respectively);
   image
 - call (asdf:load-system "foobar")
 - define tests
-
+- use symbol-call, find-symbol* or eval to construct calls with
+  symbols that yet to be defined
+- you don't need to and you SHOULD NOT specify cl:, asdf: or uiop:
+  prefixes when referring to symbols in these respective packages
+- (asdf:load-asd) goes into asdf-user package, the slime-asdf
+  extension will take care of that if you edit an asd file
