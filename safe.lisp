@@ -1,7 +1,8 @@
 ;; martin@localhost ~/quicklisp/local-projects
 ;; $ git clone https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary
 (declaim (optimize
-	  (speed 3) (safety 1) (debug 0)))
+	  (speed 3) (safety 1) (debug 1
+				      )))
 (ql:quickload :lisp-binary)
 (ql:quickload :structy-defclass)
 
@@ -150,6 +151,7 @@
       (let* ((pdl data-length)
 	     (len-sh 62)
 	     (len-ud (+ pdl (- len-sh) 1)))
+	(declare (type fixnum data-length len-sh len-ud))
 	(file-position in (+ (file-position in) len-ud))
 	(let ((header1 (read-binary 'space-packet1 in)))
 	  (list (file-position in) len-ud data-length header header1))))))
@@ -206,7 +208,9 @@
        (read-byte in)))))
 
 (defmethod get-user-data-bit ((o space-packet) n)
-  "go to the first octet of the user data. then go to the n//8-th byte and return the nth bit "
+  "go to the first octet of the user data. then go to the n//8-th byte
+and return the nth bit "
+  (declare (number n))
   ;; FIXME: this can be optimized, close over the open file
   (with-slots (filename user-data-position) o
    (with-open-file (in filename :direction :input :element-type '(unsigned-byte 8))
@@ -226,13 +230,15 @@ and returns one decoded symbol."
 		   ((atom tree) tree)
 		   ((null (cdr tree))
 		    (car tree))
-		   (t `(if (= 0 (funcall next-bit-fun))
+		   (t `(if (funcall next-bit-fun)
 			   ,(frob (car tree))
 			   ,(frob (cadr tree))
 			   
 			   )))))
     `(defun ,(intern (format nil "DECODE-~a" name))
-	 (next-bit-fun) ,(frob huffman-tree))))
+	 (next-bit-fun)
+       (declare (type function next-bit-fun))
+       ,(frob huffman-tree))))
 
 (gen-huffman-decoder brc0 (0 (1 (2 (3))))) ;; page 71 in space packet protocol data unit
 (gen-huffman-decoder brc1 (0 (1 (2 (3 (4))))))
@@ -274,7 +280,7 @@ and returns one decoded symbol."
 	 (verbose t))
     ))
 
-(defparameter *quads* (decompress (elt *headers* 0))) ;; 5.5s
+
 
 (defmethod decompress ((pkg space-packet) &key (verbose nil))
   (let* ((pkg (elt *headers* 0))
@@ -288,6 +294,10 @@ and returns one decoded symbol."
        (labels ((next-bit ()
 		  (prog1
 		      (get-user-data-bit pkg current-bit)
+		    (incf current-bit)))
+		(next-bit-p ()
+		  (prog1
+		      (= 1 (get-user-data-bit pkg current-bit))
 		    (incf current-bit)))
 		(get-brc ()
 		  (loop for j below 3 sum
@@ -306,6 +316,7 @@ and returns one decoded symbol."
 	 (let ((ie-symbols
 		(let ((decoded-symbols 0))
 		  (prog1
+
 		      (loop while (< decoded-symbols number-of-quads) collect
 			   (let* ((current-brc (get-brc))
 				  (dec (elt *decoder* current-brc)))
@@ -318,10 +329,10 @@ and returns one decoded symbol."
 			     (prog1
 				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
 				      (prog1
-		      			  (* (if (= 0 (next-bit)) 
+		      			  (* (if (next-bit-p) 
 						 -1
 						 1)
-					     (funcall dec #'next-bit))
+					     (funcall dec #'next-bit-p))
 					(incf decoded-symbols)))
 			       (when verbose
 				 (format t "~a~%" (list :ie-end-block :brc current-brc
@@ -348,10 +359,10 @@ and returns one decoded symbol."
 			     (prog1
 				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
 				      (prog1
-		      			  (* (if (= 0 (next-bit)) 
+		      			  (* (if (next-bit-p) 
 						 -1
 						 1)
-					     (funcall dec #'next-bit))
+					     (funcall dec #'next-bit-p))
 					(incf decoded-symbols)))
 			       (when verbose
 				 (format t "~a~%" (list :io-end-block :brc current-brc
@@ -382,10 +393,10 @@ and returns one decoded symbol."
 			     (prog1
 				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
 				      (prog1
-		      			  (* (if (= 0 (next-bit)) 
+		      			  (* (if (next-bit-p) 
 						 -1
 						 1)
-					     (funcall dec #'next-bit))
+					     (funcall dec #'next-bit-p))
 					(incf decoded-symbols)))
 			       (when verbose
 				 (format t "~a~%" (list :qe-end-block :brc current-brc
@@ -414,10 +425,10 @@ and returns one decoded symbol."
 			     (prog1
 				 (loop for i below 128 while (< decoded-symbols number-of-quads) collect
 				      (prog1
-		      			  (* (if (= 0 (next-bit)) 
+		      			  (* (if (next-bit-p) 
 						 -1
 						 1)
-					     (funcall dec #'next-bit))
+					     (funcall dec #'next-bit-p))
 					(incf decoded-symbols)))
 			       (when verbose
 				 (format t "~a~%" (list :qo-end-block :brc current-brc
@@ -443,7 +454,7 @@ and returns one decoded symbol."
 		 qo-symbols
 		 )))))))
 
-
+(time (defparameter *quads* (decompress (elt *headers* 0)))) ;; 5.5s
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
