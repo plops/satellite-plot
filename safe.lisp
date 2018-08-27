@@ -1,8 +1,11 @@
 ;; martin@localhost ~/quicklisp/local-projects
 ;; $ git clone https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary
-
+(declaim (optimize
+	  (speed 3) (safety 1) (debug 0)))
 (ql:quickload :lisp-binary)
 (ql:quickload :structy-defclass)
+
+
 
 (defpackage :g
   (:use :cl :lisp-binary :structy-defclass))
@@ -141,7 +144,7 @@
 
 
 (with-open-binary-file (in *fn* :direction :input)
-  (let* ((file-size (file-length in))
+  (let* (;(file-size (file-length in))
 	 (header (read-binary 'space-packet1 in)))
     (with-slots (data-length) header
       (let* ((pdl data-length)
@@ -197,7 +200,8 @@
 (defmethod get-user-data ((o space-packet))
   (with-slots (filename user-data-position) o
    (with-open-file (in filename :direction :input :element-type '(unsigned-byte 8))
-     (let* ((file-size (file-length in)))
+     (let* (;(file-size (file-length in))
+	    )
        (file-position in user-data-position)
        (read-byte in)))))
 
@@ -206,7 +210,8 @@
   ;; FIXME: this can be optimized, close over the open file
   (with-slots (filename user-data-position) o
    (with-open-file (in filename :direction :input :element-type '(unsigned-byte 8))
-     (let* ((file-size (file-length in)))
+     (let* (;(file-size (file-length in))
+	    )
        (multiple-value-bind (byte-nr bit-nr) (floor n 8)
 	 (file-position in (+ user-data-position byte-nr))
 	 (ldb (byte 1 (- 7 bit-nr)) (read-byte in)))))))
@@ -260,6 +265,7 @@ and returns one decoded symbol."
 ;; padding until the last 16bit
 ;; don't forget the sign bits
 ;; the overall package length (with header) a multiple of 32bit (4 octets p.13)
+#+nil
 (defparameter *quads*
   (let* ((pkg (elt *headers* 0))
 	 (current-bit 0)
@@ -276,7 +282,8 @@ and returns one decoded symbol."
 	 (brc-list ())
 	 (thidx-list ()))
    (with-slots (number-of-quads data-length) (slot-value pkg 'header)
-     (let ((number-of-baq-blocks (ceiling (* 2 number-of-quads)
+     (let (#+nil
+	   (number-of-baq-blocks (ceiling (* 2 number-of-quads)
 					  256)))
        (labels ((next-bit ()
 		  (prog1
@@ -436,19 +443,7 @@ and returns one decoded symbol."
 		 qo-symbols
 		 )))))))
 
-(dotimes (i 23)
-  (let ((v (let ((a 0))
-	     (loop for j below 16 do
-		  (setf (ldb (byte 1 j) a)
-			(get-user-data-bit (elt *headers* i) j)))
-	     a)))
-    (format t "~2,'0d ~5,'0d 16:~16,'0b  8:~8,'0b ~8,'0b l:~{~a~} ~%"
-	    i v v (ldb (byte 8 8) v) (ldb (byte 8 0) v)
-	    (loop for j below 4 collect
-		 (get-user-data-bit (elt *headers* i) j))
-	    )))
 
-1
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
