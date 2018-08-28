@@ -214,7 +214,7 @@ respectively);
 - radar focusing seems to be documented here:
   https://sentinel.esa.int/documents/247904/1877131/Sentinel-1-Level-1-Detailed-Algorithm-Definition
 
-
+- deramping https://sentinel.esa.int/documents/247904/1653442/Sentinel-1-TOPS-SLC_Deramping
 
 # Documentation updates
 
