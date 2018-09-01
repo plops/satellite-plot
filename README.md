@@ -232,7 +232,8 @@ respectively);
 # ASDF and testing
 
 - https://github.com/fare/asdf/blob/master/doc/best_practices.md
-
+- https://www.nicklevine.org/els2013/francois-rene-rideau.pdf
+- https://european-lisp-symposium.org/static/2016/anderson.pdf
 ## loading process:
 
 - store directory that is in the source-registry of
@@ -247,3 +248,32 @@ respectively);
   prefixes when referring to symbols in these respective packages
 - (asdf:load-asd) goes into asdf-user package, the slime-asdf
   extension will take care of that if you edit an asd file
+
+# planet video
+- https://www.youtube.com/watch?v=jxfA4WaYPrc
+- COG geotiff
+- sentinel hub playground
+- radiant.earth
+- cbers china brazil earth resources satellite
+- spacenet
+- azavea
+- developmentSEED
+- boundless
+- harrids
+- planet-stac.netlify.com
+- usgs 
+- digital globe
+- planet
+- sentinel 2
+
+- raster foundry
+- gbdx
+- planet
+- google earth engine
+
+- wfs3
+
+# Free software SAR processing
+- https://media.asf.alaska.edu/asfmainsite/documents/stp_manual.pdf
+- https://www.asf.alaska.edu/data-tools/sar-training-processor/
+- https://www.asf.alaska.edu/data-tools/other-software-tools/
