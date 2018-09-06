@@ -282,3 +282,8 @@ respectively);
   - git clone https://github.com/joa-quim/GMT5SAR/
   - too many compiler errors read_ALOS_data_SLC.c:111:13: warning:
     implicit declaration of function ‘swap_ALOS_data_info’
+- https://github.com/RadarCODE/awesome-sar
+- https://github.com/TUDelftGeodesy/Doris
+  - why does the c code have so many errors?
+  - cpxfiddle.cc:1857:21: error: ISO C++ forbids comparison between pointer and integer   if (argv[optind]=='\0')
+  - python 2.7, i think it doesn't focus

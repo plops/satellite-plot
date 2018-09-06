@@ -1,7 +1,7 @@
 ;; martin@localhost ~/quicklisp/local-projects
 ;; $ git clone https://github.com/heegaiximephoomeeghahyaiseekh/lisp-binary
 (declaim (optimize
-	  (speed 3) (safety 1) (debug 1
+	  (speed 0) (safety 3) (debug 3
 				      )))
 (ql:quickload :lisp-binary)
 (ql:quickload :structy-defclass)
@@ -157,10 +157,10 @@
 	  (list (file-position in) len-ud data-length header header1))))))
 
 (deftclass space-packet
-  header
-  filename
-  header-position
-  user-data-position)
+  (header 0 :type t)
+  (filename 0 :type t) 
+  (header-position 0 :type t)
+  (user-data-position 0 :type t))
 
 (defparameter *headers*
  (with-open-binary-file (in *fn* :direction :input)
