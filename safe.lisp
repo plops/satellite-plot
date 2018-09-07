@@ -555,45 +555,8 @@ and returns one decoded symbol."
 			       (multiple-value-list (floor current-bit
 							   16))))))))
 
-(defun decode (&key (name "qo") verbose thidx)
-  "ie .. brc=true
-   io
-   qe .. thidx=true
-   ie"
-  (let ((decoded-symbols 0))
-    (prog1
-	(loop for block from 0 while (< decoded-symbols number-of-quads) collect
-	     (let* ((current-brc (elt brc-list block))
-		    (dec (elt *decoder* current-brc)))
-	       (when thidx
-		 (push (get-thidx) thidx-list))
-	       (when verbose
-		 (format t "~a~%" (list :qe-start-block :brc current-brc
-					:block block
-					:thidx current-thidx
-					:quad decoded-symbols
-					:16bit-word-and-rest
-					(multiple-value-list (floor current-bit 16)))))
-	       (prog1
-		   (loop for i below 128 while (< decoded-symbols number-of-quads) collect
-			(prog1
-		      	    (* (if (next-bit-p) 
-				   -1
-				   1)
-			       (funcall dec #'next-bit-p))
-			  (incf decoded-symbols)))
-		 (when verbose
-		   (format t "~a~%" (list :qe-end-block :brc current-brc
-					  :block block
-					  :thidx current-thidx
-					  :quad decoded-symbols
-					  :16bit-word-and-rest
-					  (multiple-value-list (floor current-bit 16))))))))
-      (consume-padding-bits)
-      (when verbose
-	(format t "~a~%" (list :qe-end-all 
-			       :16bit-word-and-rest
-			       (multiple-value-list (floor current-bit 16))))))))
+
+
 
 (defun decode-qo ()
   (let ((decoded-symbols 0))
@@ -633,6 +596,56 @@ and returns one decoded symbol."
 			       :remaining-user-data-bits (- (* 8 (+ data-length 1 -62)) current-bit)
 			       :data-length data-length))))))
 
+
+(defun decode-quads (n &key (stage 0) get-brc verbose brc-list
+  get-thidx thidx-list consume-padding-bits next-bit-p)
+  "stage=0 name=ie .. brc=true
+   stage=1 name=io
+   stage=2 name=qe .. thidx=true thidx-list=thidx-list
+   stage=3 name=ie"
+  (let ((decoded-symbols 0)
+	(names #.(let ((l '("ie" "io" "qe" "ie")))
+		   (make-array (length l)
+			       :element-type 'string
+			       :initial-contents l))))
+    (labels ((debug (step &key brc block thidx)
+	       (when verbose
+		 (format t "~a~%" (list :step step
+					:stage stage
+					:stage-name (elt names stage)
+					:brc brc
+					:block block
+					:thidx thidx
+					:quad decoded-symbols)))))
+      (prog1
+	  (debug :start-all)
+	(loop for block from 0 while (< decoded-symbols n) collect
+	     (let* ((current-brc (if get-brc
+				     (let ((c (funcall get-brc)))
+				       (push c brc-list)
+				       c)
+				     (elt brc-list block)))
+		    (dec (elt *decoder* current-brc)))
+	       (if get-thidx
+		   (progn
+		     (push (funcall get-thidx) thidx-list)
+		     (debug :start :brc current-brc :block block
+			    :thidx (car (last thidx-list))))
+		   (debug :start :brc current-brc :block block))
+	       
+	       (prog1
+		   (loop for i below 128 while (< decoded-symbols n) collect
+			(prog1
+		      	    (* (if (funcall next-bit-p) 
+				   -1
+				   1)
+			       (funcall dec next-bit-p))
+			  (incf decoded-symbols)))
+		 (debug :stop :brc current-brc :block block))))
+	(funcall consume-padding-bits)
+	(debug :stop-all)))))
+
+
 (defmethod decompress ((pkg space-packet) &key (verbose nil))
   (let* ((pkg (elt *headers* 0))
 	 (current-bit 0)
@@ -663,20 +676,41 @@ and returns one decoded symbol."
 			     (when verbose
 			       (format t "consuming ~a padding bits.~%" pad))
 			     pad)))
-	    (let ((ie-symbols (decode-ie))
+	    (let ((ie-symbols (decode-quads number-of-quads :stage 0
+					    :get-brc #'get-brc
+					    :brc-list brc-list
+					    
+					    :verbose verbose
+					    :next-bit-p #'next-bit-p
+					    :consume-padding-bits #'consume-padding-bits
+					    ))
 		  (io-symbols
-		   )
+		   (decode-quads number-of-quads :stage 1
+				 :brc-list brc-list
+				 :verbose verbose
+				 :next-bit-p #'next-bit-p
+				 :consume-padding-bits #'consume-padding-bits))
 		  (qe-symbols
-		   )
+		   (decode-quads number-of-quads :stage 2
+				 :brc-list brc-list
+				 :get-thidx #'get-thidx
+				 :thidx-list thidx-list
+				 :verbose verbose
+				 :next-bit-p #'next-bit-p
+				 :consume-padding-bits #'consume-padding-bits))
 		  (qo-symbols
-		   )
-		  )
+		   (decode-quads number-of-quads :stage 3
+				 :brc-list brc-list
+				 :verbose verbose
+				 :next-bit-p #'next-bit-p
+				 :consume-padding-bits #'consume-padding-bits)))
 	      (list ie-symbols
 		    io-symbols
 		    qe-symbols
-		    qo-symbols
-		    ))))))))
+		    qo-symbols))))))))
 
+
+(time (defparameter *quads* (decompress (elt *headers* 0))))
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
