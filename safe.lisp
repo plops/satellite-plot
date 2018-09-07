@@ -231,9 +231,9 @@ and returns one decoded symbol."
 		   ((null (cdr tree))
 		    (car tree))
 		   (t `(if (funcall next-bit-fun)
-			   ,(frob (car tree))
-			   ,(frob (cadr tree))
 			   
+			   ,(frob (cadr tree))
+			   ,(frob (car tree))
 			   )))))
     `(defun ,(intern (format nil "DECODE-~a" name))
 	 (next-bit-fun)
@@ -456,7 +456,7 @@ and returns one decoded symbol."
 		  qo-symbols
 		  )))))))
 
-					;(time (defparameter *quads* (decompress (elt *headers* 0))))
+(time (defparameter *quads* (decompress (elt *headers* 0))))
 ;; 5.5s
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
