@@ -459,6 +459,8 @@ and returns one decoded symbol."
 (time (defparameter *quads* (decompress (elt *headers* 0))))
 ;; 5.5s
 
+;; 4.72s 760MB consed
+
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
 ;; measurement data component binary file
