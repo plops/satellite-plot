@@ -718,14 +718,16 @@ and returns one decoded symbol."
     "
 			   (let ((decoded-symbols 0)
 				 (number-of-baq-blocks (ceiling (* 2 n)
-								256)))
+								256))
+				 (decoded-symbols-a (make-array n
+								:element-type '(signed-byte 8))))
 			     (case stage
 			       (0 (setf brcs (make-array number-of-baq-blocks
 							 :element-type '(unsigned-byte 8))))
 			       (2 (setf thidxs (make-array number-of-baq-blocks
 							   :element-type '(unsigned-byte 8)))))
 			     (prog1
-				 (loop for block from 0 while (< decoded-symbols n) collect
+				 (loop for block from 0 while (< decoded-symbols n) do
 				      (let* ((current-brc (if (= 0 stage)
 							      (setf (aref brcs block)
 								    (get-brc))
@@ -734,12 +736,15 @@ and returns one decoded symbol."
 					(when (= 2 stage)
 					  (setf (aref thidxs block) (get-thidx)))
 					(prog1
-					    (loop for i below 128 while (< decoded-symbols n) collect
+					    (loop for i below 128 while (< decoded-symbols n) do
 						 (prog1
-		      				     (* (if (next-bit-p) -1 1)
-							(funcall dec #'next-bit-p))
+						     (setf (aref
+							    decoded-symbols-a decoded-symbols)
+		      					   (* (if (next-bit-p) -1 1)
+							      (funcall dec #'next-bit-p)))
 						   (incf decoded-symbols))))))
-			       (consume-padding-bits)))))
+			       (consume-padding-bits))
+			     decoded-symbols-a)))
 	    (let ((ie-symbols (decode-quads number-of-quads :stage 0))
 		  (io-symbols (decode-quads number-of-quads :stage 1))
 		  (qe-symbols (decode-quads number-of-quads :stage 2))
@@ -752,7 +757,7 @@ and returns one decoded symbol."
 
 (time (defparameter *quads* (decompress (elt *headers* 0))))
 
-;; 0.012s 650kB
+;; 0.011s 29.2kB
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
