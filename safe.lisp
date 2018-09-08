@@ -301,32 +301,25 @@ and returns one decoded symbol."
 	 (brcs ())
 	 (thidxs ()))
     (with-slots (number-of-quads data-length) (slot-value pkg 'header)
-      (let (#+nil
-	    (number-of-baq-blocks (ceiling (* 2 number-of-quads)
-					   256)))
-	(with-sequential-bit-function (pkg :name next-bit)
-	  (labels (#+nil (next-bit ()
-			   (prog1
-			       (get-user-data-bit pkg current-bit)
-			     (incf current-bit)))
-			 (next-bit-p ()
-			   (= 1 (next-bit)))
-			 (get-brc ()
-			   (loop for j below 3 sum
-				(* (expt 2 (- 2 j)) (next-bit))))
-			 (get-thidx ()
-			   (loop for j below 8 sum
-				(* (expt 2 (- 7 j)) (next-bit))))
-			 (consume-padding-bits ()
-			   (let ((pad (- 16 (mod current-bit 16))))
-			     (dotimes (i pad)
-			       ;; consume padding bits until next 16bit word boundary
-			       (next-bit))
-			     (when verbose
-			       (format t "consuming ~a padding bits.~%" pad))
-			     pad))
-			 (decode-quads (n &key (stage 0))
-			   "stage=0 name=ie .. brc=true
+      (with-sequential-bit-function (pkg :name next-bit)
+	(labels ((next-bit-p ()
+		   (= 1 (next-bit)))
+		 (get-brc ()
+		   (loop for j below 3 sum
+			(* (expt 2 (- 2 j)) (next-bit))))
+		 (get-thidx ()
+		   (loop for j below 8 sum
+			(* (expt 2 (- 7 j)) (next-bit))))
+		 (consume-padding-bits ()
+		   (let ((pad (- 16 (mod current-bit 16))))
+		     (dotimes (i pad)
+		       ;; consume padding bits until next 16bit word boundary
+		       (next-bit))
+		     (when verbose
+		       (format t "consuming ~a padding bits.~%" pad))
+		     pad))
+		 (decode-quads (n &key (stage 0))
+		   "stage=0 name=ie .. brc=true
    stage=1 name=io
    stage=2 name=qe .. thidx=true thidx-list=thidx-list
    stage=3 name=ie
@@ -335,43 +328,43 @@ and returns one decoded symbol."
    in the first stage (stage 0) every baq block contains a 3bit brc in the front
    in stage 2 every baq bloack contains an 8bit thidx in the front
     "
-			   (let ((decoded-symbols 0)
-				 (number-of-baq-blocks (ceiling (* 2 n)
-								256))
-				 (decoded-symbols-a (make-array n
-								:element-type '(signed-byte 8))))
-			     (case stage
-			       (0 (setf brcs (make-array number-of-baq-blocks
-							 :element-type '(unsigned-byte 8))))
-			       (2 (setf thidxs (make-array number-of-baq-blocks
-							   :element-type '(unsigned-byte 8)))))
-			     (prog1
-				 (loop for block from 0 while (< decoded-symbols n) do
-				      (let* ((current-brc (if (= 0 stage)
-							      (setf (aref brcs block)
-								    (get-brc))
-							      (aref brcs block)))
-					     (dec (elt *decoder* current-brc)))
-					(when (= 2 stage)
-					  (setf (aref thidxs block) (get-thidx)))
-					(prog1
-					    (loop for i below 128 while (< decoded-symbols n) do
-						 (prog1
-						     (setf (aref
-							    decoded-symbols-a decoded-symbols)
-		      					   (* (if (next-bit-p) -1 1)
-							      (funcall dec #'next-bit-p)))
-						   (incf decoded-symbols))))))
-			       (consume-padding-bits))
-			     decoded-symbols-a)))
-	    (let ((ie-symbols (decode-quads number-of-quads :stage 0))
-		  (io-symbols (decode-quads number-of-quads :stage 1))
-		  (qe-symbols (decode-quads number-of-quads :stage 2))
-		  (qo-symbols (decode-quads number-of-quads :stage 3)))
-	      (values ie-symbols
-		      io-symbols
-		      qe-symbols
-		      qo-symbols))))))))
+		   (let ((decoded-symbols 0)
+			 (number-of-baq-blocks (ceiling (* 2 n)
+							256))
+			 (decoded-symbols-a (make-array n
+							:element-type '(signed-byte 8))))
+		     (case stage
+		       (0 (setf brcs (make-array number-of-baq-blocks
+						 :element-type '(unsigned-byte 8))))
+		       (2 (setf thidxs (make-array number-of-baq-blocks
+						   :element-type '(unsigned-byte 8)))))
+		     (prog1
+			 (loop for block from 0 while (< decoded-symbols n) do
+			      (let* ((current-brc (if (= 0 stage)
+						      (setf (aref brcs block)
+							    (get-brc))
+						      (aref brcs block)))
+				     (dec (elt *decoder* current-brc)))
+				(when (= 2 stage)
+				  (setf (aref thidxs block) (get-thidx)))
+				(prog1
+				    (loop for i below 128 while (< decoded-symbols n) do
+					 (prog1
+					     (setf (aref
+						    decoded-symbols-a decoded-symbols)
+		      				   (* (if (next-bit-p) -1 1)
+						      (funcall dec #'next-bit-p)))
+					   (incf decoded-symbols))))))
+		       (consume-padding-bits))
+		     decoded-symbols-a)))
+	  (let ((ie-symbols (decode-quads number-of-quads :stage 0))
+		(io-symbols (decode-quads number-of-quads :stage 1))
+		(qe-symbols (decode-quads number-of-quads :stage 2))
+		(qo-symbols (decode-quads number-of-quads :stage 3)))
+	    (values ie-symbols
+		    io-symbols
+		    qe-symbols
+		    qo-symbols)))))))
 
 
 (time (defparameter *quads* (decompress (elt *headers* 0))))
