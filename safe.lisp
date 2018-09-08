@@ -640,7 +640,7 @@ and returns one decoded symbol."
 		      	    (* (if (funcall next-bit-p) 
 				   -1
 				   1)
-			       (funcall dec next-bit-p))
+			       (funcall dec #'next-bit-p))
 			  (incf decoded-symbols)))
 		 (debug :stop :brc current-brc :block block))))
 	(funcall consume-padding-bits)
@@ -675,49 +675,12 @@ and returns one decoded symbol."
 ;; 		:next-bit-p #'next-bit-p
 ;; 		:consume-padding-bits #'consume-padding-bits)))
 
-(let ((brcs nil)
-      (thidxs nil))
-  (defun decode-quads (n &key (stage 0) consume-padding-bits next-bit-p)
-    "stage=0 name=ie .. brc=true
-   stage=1 name=io
-   stage=2 name=qe .. thidx=true thidx-list=thidx-list
-   stage=3 name=ie
-   4 stages of data are sent
-   every baq block contains 128 symbols.
-   in the first stage (stage 0) every baq block contains a 3bit brc in the front
-   in stage 2 every baq bloack contains an 8bit thidx in the front
-    "
-    (let ((decoded-symbols 0)
-	  (number-of-baq-blocks (ceiling (* 2 n)
-					 256)))
-      (ecase stage
-	(0 (setf brcs (make-array number-of-baq-blocks
-				  :element-type '(unsigned-byte 8))))
-	(2 (setf thidxs (make-array number-of-baq-blocks
-				    :element-type '(unsigned-byte 8)))))
-      (prog1
-	  (loop for block from 0 while (< decoded-symbols n) collect
-	       (let* ((current-brc (if (= 0 stage)
-				       (setf (aref brcs block)
-					     (get-brc))
-				       (aref brcs block)))
-		      (dec (elt *decoder* current-brc)))
-		 (when (= 2 stage)
-		   (setf (aref thidxs block) (get-thidx)))
-		 (prog1
-		     (loop for i below 128 while (< decoded-symbols n) collect
-			  (prog1
-		      	      (* (if (funcall next-bit-p) -1 1)
-				 (funcall dec next-bit-p))
-			    (incf decoded-symbols))))))
-	(consume-padding-bits)))))
-
 
 (defmethod decompress ((pkg space-packet) &key (verbose nil))
   (let* ((pkg (elt *headers* 0))
 	 (current-bit 0)
-	 (brc-list ())
-	 (thidx-list ()))
+	 (brcs ())
+	 (thidxs ()))
     (with-slots (number-of-quads data-length) (slot-value pkg 'header)
       (let (#+nil
 	    (number-of-baq-blocks (ceiling (* 2 number-of-quads)
@@ -742,34 +705,45 @@ and returns one decoded symbol."
 			       (next-bit))
 			     (when verbose
 			       (format t "consuming ~a padding bits.~%" pad))
-			     pad)))
-	    (let ((ie-symbols (decode-quads number-of-quads
-					    :stage 0
-					    :get-brc #'get-brc
-					    :brc-list brc-list
-					    :next-bit-p #'next-bit-p
-					    :consume-padding-bits #'consume-padding-bits
-					    ))
-		  (io-symbols
-		   (decode-quads number-of-quads :stage 1
-				 :brc-list brc-list
-				 :verbose verbose
-				 :next-bit-p #'next-bit-p
-				 :consume-padding-bits #'consume-padding-bits))
-		  (qe-symbols
-		   (decode-quads number-of-quads :stage 2
-				 :brc-list brc-list
-				 :get-thidx #'get-thidx
-				 :thidx-list thidx-list
-				 :verbose verbose
-				 :next-bit-p #'next-bit-p
-				 :consume-padding-bits #'consume-padding-bits))
-		  (qo-symbols
-		   (decode-quads number-of-quads :stage 3
-				 :brc-list brc-list
-				 :verbose verbose
-				 :next-bit-p #'next-bit-p
-				 :consume-padding-bits #'consume-padding-bits)))
+			     pad))
+			 (decode-quads (n &key (stage 0))
+			   "stage=0 name=ie .. brc=true
+   stage=1 name=io
+   stage=2 name=qe .. thidx=true thidx-list=thidx-list
+   stage=3 name=ie
+   4 stages of data are sent
+   every baq block contains 128 symbols.
+   in the first stage (stage 0) every baq block contains a 3bit brc in the front
+   in stage 2 every baq bloack contains an 8bit thidx in the front
+    "
+			   (let ((decoded-symbols 0)
+				 (number-of-baq-blocks (ceiling (* 2 n)
+								256)))
+			     (case stage
+			       (0 (setf brcs (make-array number-of-baq-blocks
+							 :element-type '(unsigned-byte 8))))
+			       (2 (setf thidxs (make-array number-of-baq-blocks
+							   :element-type '(unsigned-byte 8)))))
+			     (prog1
+				 (loop for block from 0 while (< decoded-symbols n) collect
+				      (let* ((current-brc (if (= 0 stage)
+							      (setf (aref brcs block)
+								    (get-brc))
+							      (aref brcs block)))
+					     (dec (elt *decoder* current-brc)))
+					(when (= 2 stage)
+					  (setf (aref thidxs block) (get-thidx)))
+					(prog1
+					    (loop for i below 128 while (< decoded-symbols n) collect
+						 (prog1
+		      				     (* (if (next-bit-p) -1 1)
+							(funcall dec #'next-bit-p))
+						   (incf decoded-symbols))))))
+			       (consume-padding-bits)))))
+	    (let ((ie-symbols (decode-quads number-of-quads :stage 0))
+		  (io-symbols (decode-quads number-of-quads :stage 1))
+		  (qe-symbols (decode-quads number-of-quads :stage 2))
+		  (qo-symbols (decode-quads number-of-quads :stage 3)))
 	      (list ie-symbols
 		    io-symbols
 		    qe-symbols
@@ -777,6 +751,8 @@ and returns one decoded symbol."
 
 
 (time (defparameter *quads* (decompress (elt *headers* 0))))
+
+;; 0.012s 650kB
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
