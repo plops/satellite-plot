@@ -157,7 +157,7 @@
 	  (list (file-position in) len-ud data-length header header1))))))
 
 (deftclass space-packet
-    header
+  header
   filename 
   header-position
   user-data-position)
@@ -596,27 +596,28 @@ and returns one decoded symbol."
 			       :remaining-user-data-bits (- (* 8 (+ data-length 1 -62)) current-bit)
 			       :data-length data-length))))))
 
+(defparameter *verbose* nil)
 
 (defun decode-quads (n &key (stage 0) get-brc verbose brc-list
-  get-thidx thidx-list consume-padding-bits next-bit-p)
+			 get-thidx thidx-list consume-padding-bits next-bit-p)
   "stage=0 name=ie .. brc=true
    stage=1 name=io
    stage=2 name=qe .. thidx=true thidx-list=thidx-list
    stage=3 name=ie"
-  (let ((decoded-symbols 0)
-	(names #.(let ((l '("ie" "io" "qe" "ie")))
-		   (make-array (length l)
-			       :element-type 'string
-			       :initial-contents l))))
-    (labels ((debug (step &key brc block thidx)
-	       (when verbose
-		 (format t "~a~%" (list :step step
-					:stage stage
-					:stage-name (elt names stage)
-					:brc brc
-					:block block
-					:thidx thidx
-					:quad decoded-symbols)))))
+  (let ((decoded-symbols 0))
+    (macrolet ((debug (step &key brc block thidx)
+		 (when *verbose*
+		   `(let ((names #.(let ((l '("ie" "io" "qe" "ie")))
+				     (make-array (length l)
+						 :element-type 'string
+						 :initial-contents l))))
+		      (format t "~a~%" (list :step step
+					     :stage stage
+					     :stage-name (elt names stage)
+					     :brc brc
+					     :block block
+					     :thidx thidx
+					     :quad decoded-symbols))))))
       (prog1
 	  (debug :start-all)
 	(loop for block from 0 while (< decoded-symbols n) collect
@@ -644,6 +645,72 @@ and returns one decoded symbol."
 		 (debug :stop :brc current-brc :block block))))
 	(funcall consume-padding-bits)
 	(debug :stop-all)))))
+
+;;((ie-symbols (decode-quads number-of-quads :stage 0
+;; 			   :get-brc #'get-brc
+;; 			   :brc-list brc-list
+
+;; 			   :verbose verbose
+;; 			   :next-bit-p #'next-bit-p
+;; 			   :consume-padding-bits #'consume-padding-bits
+;; 			   ))
+;; (io-symbols
+;;  (decode-quads number-of-quads :stage 1
+;; 		:brc-list brc-list
+;; 		:verbose verbose
+;; 		:next-bit-p #'next-bit-p
+;; 		:consume-padding-bits #'consume-padding-bits))
+;; (qe-symbols
+;;  (decode-quads number-of-quads :stage 2
+;; 		:brc-list brc-list
+;; 		:get-thidx #'get-thidx
+;; 		:thidx-list thidx-list
+;; 		:verbose verbose
+;; 		:next-bit-p #'next-bit-p
+;; 		:consume-padding-bits #'consume-padding-bits))
+;; (qo-symbols
+;;  (decode-quads number-of-quads :stage 3
+;; 		:brc-list brc-list
+;; 		:verbose verbose
+;; 		:next-bit-p #'next-bit-p
+;; 		:consume-padding-bits #'consume-padding-bits)))
+
+(let ((brcs nil)
+      (thidxs nil))
+  (defun decode-quads (n &key (stage 0) consume-padding-bits next-bit-p)
+    "stage=0 name=ie .. brc=true
+   stage=1 name=io
+   stage=2 name=qe .. thidx=true thidx-list=thidx-list
+   stage=3 name=ie
+   4 stages of data are sent
+   every baq block contains 128 symbols.
+   in the first stage (stage 0) every baq block contains a 3bit brc in the front
+   in stage 2 every baq bloack contains an 8bit thidx in the front
+    "
+    (let ((decoded-symbols 0)
+	  (number-of-baq-blocks (ceiling (* 2 n)
+					 256)))
+      (ecase stage
+	(0 (setf brcs (make-array number-of-baq-blocks
+				  :element-type '(unsigned-byte 8))))
+	(2 (setf thidxs (make-array number-of-baq-blocks
+				    :element-type '(unsigned-byte 8)))))
+      (prog1
+	  (loop for block from 0 while (< decoded-symbols n) collect
+	       (let* ((current-brc (if (= 0 stage)
+				       (setf (aref brcs block)
+					     (get-brc))
+				       (aref brcs block)))
+		      (dec (elt *decoder* current-brc)))
+		 (when (= 2 stage)
+		   (setf (aref thidxs block) (get-thidx)))
+		 (prog1
+		     (loop for i below 128 while (< decoded-symbols n) collect
+			  (prog1
+		      	      (* (if (funcall next-bit-p) -1 1)
+				 (funcall dec next-bit-p))
+			    (incf decoded-symbols))))))
+	(consume-padding-bits)))))
 
 
 (defmethod decompress ((pkg space-packet) &key (verbose nil))
@@ -676,11 +743,10 @@ and returns one decoded symbol."
 			     (when verbose
 			       (format t "consuming ~a padding bits.~%" pad))
 			     pad)))
-	    (let ((ie-symbols (decode-quads number-of-quads :stage 0
+	    (let ((ie-symbols (decode-quads number-of-quads
+					    :stage 0
 					    :get-brc #'get-brc
 					    :brc-list brc-list
-					    
-					    :verbose verbose
 					    :next-bit-p #'next-bit-p
 					    :consume-padding-bits #'consume-padding-bits
 					    ))
