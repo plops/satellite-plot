@@ -460,31 +460,20 @@ and returns one decoded symbol."
 		       (0
 			(cond 
 			  ((<= thidx 3)
-			   (cond ((< m-code 3)
-				  (loop for i below 128 do
-				       (let* ((sm-code (aref symbols (+ i (*
-									   block
-									   128))))
-					      (m-code (abs sm-code))
-					      (m-code-sign (signum sm-code))))
-				       (setf (aref recon (+ i (* block 128)))
-					     (aref symbols (+ i (* block 128))))
-				       (incf symbol)))
-				 ((= 3 m-code)
-				  (loop for i below 128 do
-				       (let* ((sm-code (aref symbols (+ i (*
-									   block
-									   128))))
-					      (m-code (abs sm-code))
-					      (m-code-sign (signum sm-code))))
-				       (setf (aref recon (+ i (* block 128)))
-					     (* m-code-sign
-						(get-srp-b
-						 :brc brc
-						 :thidx thidx)))
-				       (incf symbol))))
-
-			   )
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (cond ((< m-code 3)
+					 sm-code)
+					((= 3 m-code)
+					 (* m-code-sign (get-srp-b
+							 :brc brc
+							 :thidx thidx)))))
+				
+				(incf symbol)))
 			  (t
 			   (loop for i below 128 do
 				(let* ((sm-code (aref symbols (+ i (*
