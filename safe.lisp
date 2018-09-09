@@ -476,7 +476,7 @@ and returns one decoded symbol."
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 while (<
-				     symbol number-of-quads) do
+								   symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -490,7 +490,7 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 3)
 				      (loop for i below 128 while (<
-				     symbol number-of-quads) do
+								   symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -518,7 +518,7 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 5)
 				      (loop for i below 128 while (<
-				     symbol number-of-quads) do
+								   symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -533,7 +533,7 @@ and returns one decoded symbol."
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 while (<
-				     symbol number-of-quads) do
+								   symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -561,7 +561,7 @@ and returns one decoded symbol."
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 while (<
-				     symbol number-of-quads) do
+								   symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -575,7 +575,7 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 8)
 				      (loop for i below 128 while (<
-				     symbol number-of-quads) do
+								   symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
