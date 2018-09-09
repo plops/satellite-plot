@@ -272,7 +272,7 @@ and returns one decoded symbol."
 
 
 
-(defparameter *decoder* (let ((l '(decode-brc0
+(defconstant *decoder* (let ((l '(decode-brc0
 				   decode-brc1
 				   decode-brc2
 				   decode-brc3
@@ -296,7 +296,7 @@ and returns one decoded symbol."
 ;; the overall package length (with header) a multiple of 32bit (4 octets p.13)
 
 ;; table 5.2-1 simple reconstruction parameter values B
-(defparameter *srp-b*
+(defconstant +srp-b+
   (let ((l '((3.0 4.0 6.0 9.0 15.0)
 	     (3.0 4.0 6.0 9.0 15.0)
 	     (3.16 4.08 6.0 9.0 15.0)
@@ -312,11 +312,11 @@ and returns one decoded symbol."
 		:element-type 'single-float)))
 
 (defun get-srp-b (&key (brc 0) (thidx 0))
-  (aref *srp-b* thidx brc))
+  (aref +srp-b+ thidx brc))
 
 
 ;; table 5.2-2 normalized reconstruction levels
-(defparameter *nrl*
+(defconstant +nrl+
   (let ((l '((0.2490 0.1290 0.0660 0.3637 0.3042 0.2305 0.1702 0.1130)
 	     (0.7681 0.3900 0.1985 1.0915 0.9127 0.6916 0.5107 0.3389)
 	     (1.3655 0.6601 0.3320 1.8208 1.5216 1.1528 0.8511 0.5649)
@@ -341,12 +341,12 @@ and returns one decoded symbol."
 
 
 (defun get-fdbaq-nrl (&key mcode brc)
-  (aref *nrl* mcode (+ brc 3)))
+  (aref +nrl+ mcode (+ brc 3)))
 
 
 ;; table 5.2-3 sigma factors
 
-(defparameter *sf*
+(defconstant +sf+
   (let ((l '(0.00 0.63 1.25 1.88 2.51 3.13 3.76 4.39 5.01 5.64 6.27
 	     6.89 7.52 8.15 8.77 9.40 10.03 10.65 11.28 11.91 12.53 13.16 13.79
 	     14.41 15.04 15.67 16.29 16.92 17.55 18.17 18.80 19.43 20.05 20.68
@@ -378,7 +378,7 @@ and returns one decoded symbol."
 		:element-type 'single-float)))
 
 (defun get-sf (&key thidx)
-  (aref *sf* thidx))
+  (aref +sf+ thidx))
 
 (defmethod decompress ((pkg space-packet) &key (verbose nil))
   (let* ((pkg (elt *headers* 0))
@@ -452,8 +452,7 @@ and returns one decoded symbol."
 	    (let ((symbol 0)
 		  (symbols ie-symbols)
 		  (recon (make-array number-of-quads :element-type 'single-float)))
-	      (loop for block from 0 while (< symbol number-of-quads)
-		 do
+	      (loop for block from 0 while (< symbol number-of-quads) do
 		   (let ((thidx (aref thidxs block))
 			 (brc (aref brcs block)))
 		     (ecase brc
@@ -493,9 +492,151 @@ and returns one decoded symbol."
 					   (get-fdbaq-nrl :mcode m-code
 							  :brc brc)
 					   (get-sf :thidx thidx))))
-				
-				(incf symbol))))))
-		     )))
+				(incf symbol)))))
+		       (1
+			(cond 
+			  ((<= thidx 3)
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (cond ((< m-code 4)
+					 (setf (aref recon (+ i (*  block
+								    128)))
+					       sm-code))
+					((= 4 m-code)
+					 (setf (aref recon (+ i (*
+								 block
+								 128)))
+					       (* m-code-sign (get-srp-b
+							       :brc brc
+							       :thidx thidx))))))
+				(incf symbol)))
+			  (t
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (setf (aref recon (+ i (*
+							  block
+							  128)))
+					(* m-code-sign
+					   (get-fdbaq-nrl :mcode m-code
+							  :brc brc)
+					   (get-sf :thidx thidx))))
+				(incf symbol)))))
+		       (2
+			(cond 
+			  ((<= thidx 5)
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (cond ((< m-code 6)
+					 (setf (aref recon (+ i (*  block
+								    128)))
+					       sm-code))
+					((= 6 m-code)
+					 (setf (aref recon (+ i (*
+								 block
+								 128)))
+					       (* m-code-sign (get-srp-b
+							       :brc brc
+							       :thidx thidx))))))
+				(incf symbol)))
+			  (t
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (setf (aref recon (+ i (*
+							  block
+							  128)))
+					(* m-code-sign
+					   (get-fdbaq-nrl :mcode m-code
+							  :brc brc)
+					   (get-sf :thidx thidx))))
+				(incf symbol)))))
+		       (3
+			(cond 
+			  ((<= thidx 6)
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (cond ((< m-code 9)
+					 (setf (aref recon (+ i (*  block
+								    128)))
+					       sm-code))
+					((= 9 m-code)
+					 (setf (aref recon (+ i (*
+								 block
+								 128)))
+					       (* m-code-sign (get-srp-b
+							       :brc brc
+							       :thidx thidx))))))
+				(incf symbol)))
+			  (t
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (setf (aref recon (+ i (*
+							  block
+							  128)))
+					(* m-code-sign
+					   (get-fdbaq-nrl :mcode m-code
+							  :brc brc)
+					   (get-sf :thidx thidx))))
+				(incf symbol)))))
+		       (4
+			(cond 
+			  ((<= thidx 8)
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (cond ((< m-code 15)
+					 (setf (aref recon (+ i (*  block
+								    128)))
+					       sm-code))
+					((= 15 m-code)
+					 (setf (aref recon (+ i (*
+								 block
+								 128)))
+					       (* m-code-sign (get-srp-b
+							       :brc brc
+							       :thidx thidx))))))
+				(incf symbol)))
+			  (t
+			   (loop for i below 128 do
+				(let* ((sm-code (aref symbols (+ i (*
+								    block
+								    128))))
+				       (m-code (abs sm-code))
+				       (m-code-sign (signum sm-code)))
+				  (setf (aref recon (+ i (*
+							  block
+							  128)))
+					(* m-code-sign
+					   (get-fdbaq-nrl :mcode m-code
+							  :brc brc)
+					   (get-sf :thidx thidx))))
+				(incf symbol)))))))))
 	    (values ie-symbols
 		    io-symbols
 		    qe-symbols
