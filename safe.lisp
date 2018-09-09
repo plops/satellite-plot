@@ -460,14 +460,11 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 3)
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
 					     (cond ((< m-code 3)
-						    (setf (aref recon (+ i (*  block
-									       128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 sm-code)))
 						   ((= 3 m-code)
 						    (setf (aref recon (+ i (*
@@ -480,14 +477,10 @@ and returns one decoded symbol."
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
-					     (setf (aref recon (+ i (*
-								     block
-								     128)))
+					     (setf (aref recon symbol)
 						   (* 1s0 m-code-sign
 						      (get-fdbaq-nrl :mcode m-code
 								     :brc brc)
@@ -497,33 +490,24 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 3)
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
 					     (cond ((< m-code 4)
-						    (setf (aref recon (+ i (*  block
-									       128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 sm-code)))
 						   ((= 4 m-code)
-						    (setf (aref recon (+ i (*
-									    block
-									    128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 m-code-sign (get-srp-b
 									      :brc brc
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
-					     (setf (aref recon (+ i (*
-								     block
-								     128)))
+					     (setf (aref recon symbol)
 						   (* 1s0 m-code-sign
 						      (get-fdbaq-nrl :mcode m-code
 								     :brc brc)
@@ -533,33 +517,24 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 5)
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
 					     (cond ((< m-code 6)
-						    (setf (aref recon (+ i (*  block
-									       128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 sm-code)))
 						   ((= 6 m-code)
-						    (setf (aref recon (+ i (*
-									    block
-									    128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 m-code-sign (get-srp-b
 									      :brc brc
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
-					     (setf (aref recon (+ i (*
-								     block
-								     128)))
+					     (setf (aref recon symbol)
 						   (* 1s0 m-code-sign
 						      (get-fdbaq-nrl :mcode m-code
 								     :brc brc)
@@ -569,33 +544,24 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 6)
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
 					     (cond ((< m-code 9)
-						    (setf (aref recon (+ i (*  block
-									       128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 sm-code)))
 						   ((= 9 m-code)
-						    (setf (aref recon (+ i (*
-									    block
-									    128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 m-code-sign (get-srp-b
 									      :brc brc
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
-					     (setf (aref recon (+ i (*
-								     block
-								     128)))
+					     (setf (aref recon symbol)
 						   (* 1s0 m-code-sign
 						      (get-fdbaq-nrl :mcode m-code
 								     :brc brc)
@@ -605,33 +571,24 @@ and returns one decoded symbol."
 				   (cond 
 				     ((<= thidx 8)
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
 					     (cond ((< m-code 15)
-						    (setf (aref recon (+ i (*  block
-									       128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 sm-code)))
 						   ((= 15 m-code)
-						    (setf (aref recon (+ i (*
-									    block
-									    128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 m-code-sign (get-srp-b
 									      :brc brc
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
 				      (loop for i below 128 do
-					   (let* ((sm-code (aref symbols (+ i (*
-									       block
-									       128))))
+					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
-					     (setf (aref recon (+ i (*
-								     block
-								     128)))
+					     (setf (aref recon symbol)
 						   (* 1s0 m-code-sign
 						      (get-fdbaq-nrl :mcode m-code
 								     :brc brc)
