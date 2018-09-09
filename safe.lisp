@@ -467,9 +467,7 @@ and returns one decoded symbol."
 						    (setf (aref recon symbol)
 							  (* 1s0 sm-code)))
 						   ((= 3 m-code)
-						    (setf (aref recon (+ i (*
-									    block
-									    128)))
+						    (setf (aref recon symbol)
 							  (* 1s0 m-code-sign (get-srp-b
 									      :brc brc
 									      :thidx thidx))))))
