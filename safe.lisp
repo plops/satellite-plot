@@ -619,7 +619,24 @@ and returns one decoded symbol."
 		z))))))))
 
 
-(time (defparameter *quads* (decompress (elt *headers* 0))))
+(time (defparameter *quads* (loop for e in *headers* and i from 0 do
+				 (when (= 0 (mod i 100))
+				   (format t "~a~%" i))
+				 (decompress e))))
+
+(length *headers*)
+
+;; 51900
+;; Evaluation took:
+;;   383.204 seconds of real time
+;;   382.323151 seconds of total run time (380.518252 user, 1.804899 system)
+;;   [ Run times consist of 1.878 seconds GC time, and 380.446 seconds non-GC time. ]
+;;   99.77% CPU
+;;   968,355,143,528 processor cycles
+;;   18,539,032,112 bytes consed
+
+;; (floor 383.2 60)
+
 
 ;; 0.008s 341kB
 
