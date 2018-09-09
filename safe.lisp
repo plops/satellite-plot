@@ -598,11 +598,25 @@ and returns one decoded symbol."
 						      (get-fdbaq-nrl :mcode m-code
 								     :brc brc)
 						      (get-sf :thidx thidx))))
-					   (incf symbol)))))))))))
-	      (values (reconstruct ie-symbols)
-		      (reconstruct io-symbols)
-		      (reconstruct qe-symbols)
-		      (reconstruct qo-symbols)))))))))
+					   (incf symbol))))))))
+			 recon)))
+	      ;; sample alignment p. 75
+	      (let* ((ie-r (reconstruct ie-symbols))
+		     (io-r (reconstruct io-symbols))
+		     (qe-r (reconstruct qe-symbols))
+		     (qo-r (reconstruct qo-symbols))
+		     (nq (length ie-symbols))
+		     (z (make-array (* 2 nq)
+				    :element-type '(complex
+						    single-float))))
+		(dotimes (i nq)
+		  (setf (aref z (- (* 2 i) 1))
+			(complex (aref ie-r i)
+				 (aref qe-r i))
+			(aref z (* 2 i))
+			(complex (aref io-r i)
+				 (aref qo-r i))))
+		z))))))))
 
 
 (time (defparameter *quads* (decompress (elt *headers* 0))))
