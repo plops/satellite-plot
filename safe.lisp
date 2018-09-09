@@ -605,15 +605,15 @@ and returns one decoded symbol."
 		     (io-r (reconstruct io-symbols))
 		     (qe-r (reconstruct qe-symbols))
 		     (qo-r (reconstruct qo-symbols))
-		     (nq (length ie-symbols))
+		     (nq (length ie-r))
 		     (z (make-array (* 2 nq)
 				    :element-type '(complex
 						    single-float))))
 		(dotimes (i nq)
-		  (setf (aref z (- (* 2 i) 1))
+		  (setf (aref z (* 2 i))
 			(complex (aref ie-r i)
 				 (aref qe-r i))
-			(aref z (* 2 i))
+			(aref z (+ 1 (* 2 i)))
 			(complex (aref io-r i)
 				 (aref qo-r i))))
 		z))))))))
@@ -621,7 +621,7 @@ and returns one decoded symbol."
 
 (time (defparameter *quads* (decompress (elt *headers* 0))))
 
-;; 0.011s 209kB
+;; 0.008s 341kB
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
