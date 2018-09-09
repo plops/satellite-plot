@@ -472,8 +472,8 @@ and returns one decoded symbol."
 					       sm-code))
 					((= 3 m-code)
 					 (setf (aref recon (+ i (*
-								    block
-								    128)))
+								 block
+								 128)))
 					       (* m-code-sign (get-srp-b
 							       :brc brc
 							       :thidx thidx))))))
@@ -487,12 +487,12 @@ and returns one decoded symbol."
 				       (m-code (abs sm-code))
 				       (m-code-sign (signum sm-code)))
 				  (setf (aref recon (+ i (*
-								    block
-								    128)))
-				   (* m-code-sign
-				      (get-fdbaq-nrl :mcode m-code
-						     :brc brc)
-				      (get-sf :thidx thidx))))
+							  block
+							  128)))
+					(* m-code-sign
+					   (get-fdbaq-nrl :mcode m-code
+							  :brc brc)
+					   (get-sf :thidx thidx))))
 				
 				(incf symbol))))))
 		     )))
