@@ -450,8 +450,9 @@ and returns one decoded symbol."
 	    ;; go through each baq block of 128 m-code symbols
 	    ;; use algorithm depending on brc, thidx and m-code
 	    (labels ((reconstruct (symbols)
-		       (let ((symbol 0)
-			     (recon (make-array number-of-quads :element-type 'single-float)))
+		       (let* ((symbol 0)
+			      (number-of-quads (length symbols))
+			      (recon (make-array number-of-quads :element-type 'single-float)))
 			 (loop for block from 0 while (< symbol number-of-quads) do
 			      (let ((thidx (aref thidxs block))
 				    (brc (aref brcs block)))
@@ -459,7 +460,7 @@ and returns one decoded symbol."
 				  (0
 				   (cond 
 				     ((<= thidx 3)
-				      (loop for i below 128 do
+				      (loop for i below 128 while (< symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -474,7 +475,8 @@ and returns one decoded symbol."
 					   
 					   (incf symbol)))
 				     (t
-				      (loop for i below 128 do
+				      (loop for i below 128 while (<
+				     symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -487,7 +489,8 @@ and returns one decoded symbol."
 				  (1
 				   (cond 
 				     ((<= thidx 3)
-				      (loop for i below 128 do
+				      (loop for i below 128 while (<
+				     symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -501,7 +504,7 @@ and returns one decoded symbol."
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
-				      (loop for i below 128 do
+				      (loop for i below 128 while (< symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -514,7 +517,8 @@ and returns one decoded symbol."
 				  (2
 				   (cond 
 				     ((<= thidx 5)
-				      (loop for i below 128 do
+				      (loop for i below 128 while (<
+				     symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -528,7 +532,8 @@ and returns one decoded symbol."
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
-				      (loop for i below 128 do
+				      (loop for i below 128 while (<
+				     symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -541,7 +546,7 @@ and returns one decoded symbol."
 				  (3
 				   (cond 
 				     ((<= thidx 6)
-				      (loop for i below 128 do
+				      (loop for i below 128 while (< symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -555,7 +560,8 @@ and returns one decoded symbol."
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
-				      (loop for i below 128 do
+				      (loop for i below 128 while (<
+				     symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -568,7 +574,8 @@ and returns one decoded symbol."
 				  (4
 				   (cond 
 				     ((<= thidx 8)
-				      (loop for i below 128 do
+				      (loop for i below 128 while (<
+				     symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -582,7 +589,7 @@ and returns one decoded symbol."
 									      :thidx thidx))))))
 					   (incf symbol)))
 				     (t
-				      (loop for i below 128 do
+				      (loop for i below 128 while (< symbol number-of-quads) do
 					   (let* ((sm-code (aref symbols symbol))
 						  (m-code (abs sm-code))
 						  (m-code-sign (signum sm-code)))
@@ -600,7 +607,7 @@ and returns one decoded symbol."
 
 (time (defparameter *quads* (decompress (elt *headers* 0))))
 
-;; 0.011s 29.2kB
+;; 0.011s 209kB
 
 ;; https://sentinels.copernicus.eu/c/document_library/get_file?folderId=349449&name=DLFE-4502.pdf
 
