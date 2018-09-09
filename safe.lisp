@@ -468,12 +468,12 @@ and returns one decoded symbol."
 					    (cond ((< m-code 3)
 						   (setf (aref recon (+ i (*  block
 									      128)))
-							 sm-code))
+							 (* 1s0 sm-code)))
 						  ((= 3 m-code)
 						   (setf (aref recon (+ i (*
 									   block
 									   128)))
-							 (* m-code-sign (get-srp-b
+							 (* 1s0 m-code-sign (get-srp-b
 									 :brc brc
 									 :thidx thidx))))))
 				
@@ -488,7 +488,7 @@ and returns one decoded symbol."
 					    (setf (aref recon (+ i (*
 								    block
 								    128)))
-						  (* m-code-sign
+						  (* 1s0 m-code-sign
 						     (get-fdbaq-nrl :mcode m-code
 								    :brc brc)
 						     (get-sf :thidx thidx))))
@@ -505,12 +505,12 @@ and returns one decoded symbol."
 					    (cond ((< m-code 4)
 						   (setf (aref recon (+ i (*  block
 									      128)))
-							 sm-code))
+							 (* 1s0 sm-code)))
 						  ((= 4 m-code)
 						   (setf (aref recon (+ i (*
 									   block
 									   128)))
-							 (* m-code-sign (get-srp-b
+							 (* 1s0 m-code-sign (get-srp-b
 									 :brc brc
 									 :thidx thidx))))))
 					  (incf symbol)))
@@ -524,7 +524,7 @@ and returns one decoded symbol."
 					    (setf (aref recon (+ i (*
 								    block
 								    128)))
-						  (* m-code-sign
+						  (* 1s0 m-code-sign
 						     (get-fdbaq-nrl :mcode m-code
 								    :brc brc)
 						     (get-sf :thidx thidx))))
@@ -541,12 +541,12 @@ and returns one decoded symbol."
 					    (cond ((< m-code 6)
 						   (setf (aref recon (+ i (*  block
 									      128)))
-							 sm-code))
+							 (* 1s0 sm-code)))
 						  ((= 6 m-code)
 						   (setf (aref recon (+ i (*
 									   block
 									   128)))
-							 (* m-code-sign (get-srp-b
+							 (* 1s0 m-code-sign (get-srp-b
 									 :brc brc
 									 :thidx thidx))))))
 					  (incf symbol)))
@@ -560,7 +560,7 @@ and returns one decoded symbol."
 					    (setf (aref recon (+ i (*
 								    block
 								    128)))
-						  (* m-code-sign
+						  (* 1s0 m-code-sign
 						     (get-fdbaq-nrl :mcode m-code
 								    :brc brc)
 						     (get-sf :thidx thidx))))
@@ -577,12 +577,12 @@ and returns one decoded symbol."
 					    (cond ((< m-code 9)
 						   (setf (aref recon (+ i (*  block
 									      128)))
-							 sm-code))
+							 (* 1s0 sm-code)))
 						  ((= 9 m-code)
 						   (setf (aref recon (+ i (*
 									   block
 									   128)))
-							 (* m-code-sign (get-srp-b
+							 (* 1s0 m-code-sign (get-srp-b
 									 :brc brc
 									 :thidx thidx))))))
 					  (incf symbol)))
@@ -596,7 +596,7 @@ and returns one decoded symbol."
 					    (setf (aref recon (+ i (*
 								    block
 								    128)))
-						  (* m-code-sign
+						  (* 1s0 m-code-sign
 						     (get-fdbaq-nrl :mcode m-code
 								    :brc brc)
 						     (get-sf :thidx thidx))))
@@ -613,12 +613,12 @@ and returns one decoded symbol."
 					    (cond ((< m-code 15)
 						   (setf (aref recon (+ i (*  block
 									      128)))
-							 sm-code))
+							 (* 1s0 sm-code)))
 						  ((= 15 m-code)
 						   (setf (aref recon (+ i (*
 									   block
 									   128)))
-							 (* m-code-sign (get-srp-b
+							 (* 1s0 m-code-sign (get-srp-b
 									 :brc brc
 									 :thidx thidx))))))
 					  (incf symbol)))
@@ -632,7 +632,7 @@ and returns one decoded symbol."
 					    (setf (aref recon (+ i (*
 								    block
 								    128)))
-						  (* m-code-sign
+						  (* 1s0 m-code-sign
 						     (get-fdbaq-nrl :mcode m-code
 								    :brc brc)
 						     (get-sf :thidx thidx))))
