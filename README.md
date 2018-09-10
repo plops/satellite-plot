@@ -287,3 +287,7 @@ respectively);
   - why does the c code have so many errors?
   - cpxfiddle.cc:1857:21: error: ISO C++ forbids comparison between pointer and integer   if (argv[optind]=='\0')
   - python 2.7, i think it doesn't focus
+
+# Sentinel 3 Altimeter
+- http://www.altimetry.info/filestorage/Radar_Altimetry_Tutorial.pdf
+- does it make images?
