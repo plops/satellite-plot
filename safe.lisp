@@ -635,6 +635,17 @@ and returns one decoded symbol."
 ;;   968,355,143,528 processor cycles
 ;;   18,539,032,112 bytes consed
 
+;; on gpd pocket
+;; 51900
+;; Evaluation took:
+;;   1329.796 seconds of real time
+;;   1329.989174 seconds of total run time (1323.118852 user, 6.870322 system)
+;;   [ Run times consist of 5.221 seconds GC time, and 1324.769 seconds non-GC time. ]
+;;   100.01% CPU
+;;   18 lambdas converted
+;;   2,127,655,579,180 processor cycles
+;;   22,757,435,104 bytes consed
+  
 ;; (floor 383.2 60)
 
 
