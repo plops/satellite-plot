@@ -622,9 +622,9 @@ and returns one decoded symbol."
 (time (defparameter *quads* (loop for e in *headers* and i from 0 do
 				 (when (= 0 (mod i 100))
 				   (format t "~a~%" i))
+
 				 (decompress e))))
 
-(length *headers*)
 
 ;; 51900
 ;; Evaluation took:
@@ -647,6 +647,67 @@ and returns one decoded symbol."
 ;;   22,757,435,104 bytes consed
   
 ;; (floor 383.2 60)
+
+
+(time
+ (let* ((nproc 4)
+	(lines-per-proc (ceiling (length *headers*) nproc))
+	(chunks (loop for p below nproc collect
+		     (subseq *headers*
+			     (* p lines-per-proc)
+			     (min (length *headers*)
+				  (* (+ 1 p) lines-per-proc)))))
+	(threads (loop for chunk in chunks and p from 0 collect
+		      (sb-thread:make-thread #'(lambda ()
+						 (loop for e in chunk and i from 0 do
+						      (when (= 0 (mod i 100))
+							(format t "~a ~a%~%" p (* (/ 100.0 (length chunk)) i )))
+						      (decompress e)))
+					     :name (format nil "sat-parse-~a" p)))))
+   (loop for th in threads do
+	(sb-thread:join-thread th))))
+(length *headers*)
+
+;; Evaluation took:
+;;   256.223 seconds of real time
+;;   981.185667 seconds of total run time (971.369248 user, 9.816419 system)
+;;   [ Run times consist of 5.798 seconds GC time, and 975.388 seconds non-GC time. ]
+;;   382.94% CPU
+;;   409,954,965,340 processor cycles
+;;   22,706,930,816 bytes consed
+  
+
+;; Core (SKT) | EXEC | IPC  | FREQ | L2MISS | L2HIT | TEMP
+
+;;    0    0     1.02   1.09   0.93   1030 K    0.83     15
+;;    1    0     1.01   1.09   0.92    913 K    0.84     15
+;;    2    0     0.92   1.00   0.92   2492 K    0.77     22
+;;    3    0     1.01   1.10   0.92    982 K    0.81     22
+;; ---------------------------------------------------------------------------------------------------------------
+;;  TOTAL  *     0.99   1.07   0.93   5419 K    0.80     N/A
+
+;;  Instructions retired:   10 G ; Active cycles: 9891 M ; Time (TSC): 2668 Mticks ; C0 (active,non-halted) core residency: 59.54 %
+
+;;  C1 core residency: 40.04 %; C3 core residency: 0.00 %; C6 core residency: 0.42 %; C7 core residency: 0.00 %;
+;;  C2 package residency: 0.00 %; C4 package residency: 0.00 %; C6 package residency: 0.00 %;
+
+;;  PHYSICAL CORE IPC                 : 1.07 => corresponds to 53.49 % utilization for cores in active state
+;;  Instructions per nominal CPU cycle: 0.99 => corresponds to 49.56 % core utilization over time interval
+;;  SMI count: 0
+;; ---------------------------------------------------------------------------------------------------------------
+;; MEM (GB)->| CPU energy |
+;; ---------------------------------------------------------------------------------------------------------------
+;;  SKT   0       5.92     
+;; ---------------------------------------------------------------------------------------------------------------
+
+;;  EXEC  : instructions per nominal CPU cycle
+;;  IPC   : instructions per CPU cycle
+;;  FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+;;  L2MISS: L2 cache misses 
+;;  L2HIT : L2 cache hit ratio (0.00-1.00)
+;;  TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+;;  energy: Energy in Joules
+
 
 
 ;; 0.008s 341kB
