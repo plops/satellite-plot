@@ -657,15 +657,23 @@ and returns one decoded symbol."
 			     (* p lines-per-proc)
 			     (min (length *headers*)
 				  (* (+ 1 p) lines-per-proc)))))
+	(out (loop for p below nproc collect
+		  (open (format nil "/home/martin/sat-data/chunk~a" p)
+			:direction :output :element-type '(complex single-float)
+			:if-does-not-exist :create
+			:if-exists :supersede)))
 	(threads (loop for chunk in chunks and p from 0 collect
 		      (sb-thread:make-thread #'(lambda ()
 						 (loop for e in chunk and i from 0 do
 						      (when (= 0 (mod i 100))
 							(format t "~a ~a%~%" p (* (/ 100.0 (length chunk)) i )))
-						      (decompress e)))
+						      (let ((z (decompress e)))
+							(write-sequence z (elt out i)))))
 					     :name (format nil "sat-parse-~a" p)))))
    (loop for th in threads do
-	(sb-thread:join-thread th))))
+	(sb-thread:join-thread th))
+   (loop for o in out do
+	(close o))))
 (length *headers*)
 
 ;; Evaluation took:
