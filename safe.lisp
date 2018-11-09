@@ -618,7 +618,7 @@ and returns one decoded symbol."
 				 (aref qo-r i))))
 		z))))))))
 
-
+#+nil
 (time (defparameter *quads* (loop for e in *headers* and i from 0 do
 				 (when (= 0 (mod i 100))
 				   (format t "~a~%" i))
@@ -663,7 +663,7 @@ and returns one decoded symbol."
 			:if-does-not-exist :create
 			:if-exists :supersede)))
 	(threads (loop for chunk in chunks and p from 0 collect
-		      (sb-thread:make-thread #'(lambda ()
+		      (sb-thread:make-thread #'(lambda (p)
 						 (loop for e in chunk and i from 0 do
 						      (when (= 0 (mod i 100))
 							(format t "~a ~a%~%" p (* (/ 100.0 (length chunk)) i )))
@@ -673,7 +673,8 @@ and returns one decoded symbol."
 							    (sb-posix:write (sb-ext::fd-stream-fd (elt out p)) start-sap (* (/ (* 2 32) 8)
 														      (length z)))))
 							#+nil (write-sequence z (elt out i)))))
-					     :name (format nil "sat-parse-~a" p)))))
+					     :name (format nil "sat-parse-~a" p)
+					     :arguments p))))
    (loop for th in threads do
 	(sb-thread:join-thread th))
    (loop for o in out do
