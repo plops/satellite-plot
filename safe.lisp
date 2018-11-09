@@ -659,7 +659,7 @@ and returns one decoded symbol."
 				  (* (+ 1 p) lines-per-proc)))))
 	(out (loop for p below nproc collect
 		  (open (format nil "/home/martin/sat-data/chunk~a" p)
-			:direction :output :element-type '(complex single-float)
+			:direction :output :element-type '(unsigned-byte 8)
 			:if-does-not-exist :create
 			:if-exists :supersede)))
 	(threads (loop for chunk in chunks and p from 0 collect
@@ -668,7 +668,11 @@ and returns one decoded symbol."
 						      (when (= 0 (mod i 100))
 							(format t "~a ~a%~%" p (* (/ 100.0 (length chunk)) i )))
 						      (let ((z (decompress e)))
-							(write-sequence z (elt out i)))))
+							(sb-sys:with-pinned-objects (z)
+							  (let ((start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
+							    (sb-posix:write (sb-ext::fd-stream-fd (elt out p)) start-sap (* (/ (* 2 32) 8)
+														      (length z)))))
+							#+nil (write-sequence z (elt out i)))))
 					     :name (format nil "sat-parse-~a" p)))))
    (loop for th in threads do
 	(sb-thread:join-thread th))
@@ -684,9 +688,11 @@ and returns one decoded symbol."
 
 
 (let* ((z (make-array 12 :element-type '(complex single-float)))
-      (start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
-  (sb-posix:write (sb-ext::fd-stream-fd *bla*) start-sap (* (/ (* 2 32) 8)
-							    (length z))))
+       )
+  (sb-sys:with-pinned-objects (z)
+   (let ((start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
+     (sb-posix:write (sb-ext::fd-stream-fd *bla*) start-sap (* (/ (* 2 32) 8)
+							       (length z))))))
 
 
 
