@@ -698,6 +698,16 @@ and returns one decoded symbol."
 
 
 1
+;; with storing:
+;; Evaluation took:
+;;   375.340 seconds of real time
+;;   990.958071 seconds of total run time (962.100751 user, 28.857320 system)
+;;   [ Run times consist of 4.830 seconds GC time, and 986.129 seconds non-GC time. ]
+;;   264.02% CPU
+;;   600,541,376,880 processor cycles
+;;   22,705,892,368 bytes consed
+  
+;; without storing:
 ;; Evaluation took:
 ;;   256.223 seconds of real time
 ;;   981.185667 seconds of total run time (971.369248 user, 9.816419 system)
