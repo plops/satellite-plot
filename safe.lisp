@@ -676,6 +676,21 @@ and returns one decoded symbol."
 	(close o))))
 (length *headers*)
 
+(defparameter *bla*
+ (open (format nil "/home/martin/sat-data/chunk~a" 1)
+       :direction :output :element-type '(unsigned-byte 8)
+       :if-does-not-exist :create
+       :if-exists :supersede))
+
+
+(let* ((z (make-array 12 :element-type '(complex single-float)))
+      (start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
+  (sb-posix:write (sb-ext::fd-stream-fd *bla*) start-sap (* (/ (* 2 32) 8)
+							    (length z))))
+
+
+
+1
 ;; Evaluation took:
 ;;   256.223 seconds of real time
 ;;   981.185667 seconds of total run time (971.369248 user, 9.816419 system)
