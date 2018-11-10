@@ -10,11 +10,12 @@ df=pd.read_csv("/home/martin/sat-data/headers.csv")
 
 n=((2)*(df["NUMBER-OF-QUADS"].iloc[0]))
 
-a=np.fromfile("/home/martin/sat-data/chunk0", dtype=np.complex64, count=((600)*(n))).reshape((600, n))
+w=df.iloc[((1)!=(np.diff(df[((6)==(df["SAB-SSB-ELEVATION-BEAM-ADDRESS"]))].index)))].index[0]
+
+a=np.fromfile("/home/martin/sat-data/chunk0", dtype=np.complex64, count=((w)*(n))).reshape((w,n,))
 win=np.hamming(n)
-k=np.fft.fft2(((win)*(a)), axes=[0])
 
-ax=plt.subplot2grid((1, 1), (0, 0))
+ax=plt.subplot2grid((1,1,), (0,0,))
 
-plt.imshow(np.real(((a)*(((1)+(((0)*(win))))))))
+plt.imshow(np.real(a))
 ax.set_aspect("auto")
