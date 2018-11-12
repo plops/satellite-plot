@@ -618,13 +618,13 @@ and returns one decoded symbol."
 				 (aref qo-r i))))
 		z))))))))
 
-
+#+nil
 (time (defparameter *quads* (loop for e in *headers* and i from 0 do
 				 (when (= 0 (mod i 100))
 				   (format t "~a~%" i))
+
 				 (decompress e))))
 
-(length *headers*)
 
 ;; 51900
 ;; Evaluation took:
@@ -635,7 +635,119 @@ and returns one decoded symbol."
 ;;   968,355,143,528 processor cycles
 ;;   18,539,032,112 bytes consed
 
+;; on gpd pocket
+;; 51900
+;; Evaluation took:
+;;   1329.796 seconds of real time
+;;   1329.989174 seconds of total run time (1323.118852 user, 6.870322 system)
+;;   [ Run times consist of 5.221 seconds GC time, and 1324.769 seconds non-GC time. ]
+;;   100.01% CPU
+;;   18 lambdas converted
+;;   2,127,655,579,180 processor cycles
+;;   22,757,435,104 bytes consed
+  
 ;; (floor 383.2 60)
+
+
+(time
+ (let* ((nproc 4)
+	(lines-per-proc (ceiling (length *headers*) nproc))
+	(chunks (loop for p below nproc collect
+		     (subseq *headers*
+			     (* p lines-per-proc)
+			     (min (length *headers*)
+				  (* (+ 1 p) lines-per-proc)))))
+	(out (loop for p below nproc collect
+		  (open (format nil "/home/martin/sat-data/chunk~a" p)
+			:direction :output :element-type '(unsigned-byte 8)
+			:if-does-not-exist :create
+			:if-exists :supersede)))
+	(threads (loop for chunk in chunks and p from 0 collect
+		      (sb-thread:make-thread #'(lambda (p)
+						 (loop for e in chunk and i from 0 do
+						      (when (= 0 (mod i 100))
+							(format t "~a ~a%~%" p (* (/ 100.0 (length chunk)) i )))
+						      (let ((z (decompress e)))
+							(sb-sys:with-pinned-objects (z)
+							  (let ((start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
+							    (sb-posix:write (sb-ext::fd-stream-fd (elt out p)) start-sap (* (/ (* 2 32) 8)
+														      (length z)))))
+							#+nil (write-sequence z (elt out i)))))
+					     :name (format nil "sat-parse-~a" p)
+					     :arguments p))))
+   (loop for th in threads do
+	(sb-thread:join-thread th))
+   (loop for o in out do
+	(close o))))
+(length *headers*)
+
+(defparameter *bla*
+ (open (format nil "/home/martin/sat-data/chunk~a" 1)
+       :direction :output :element-type '(unsigned-byte 8)
+       :if-does-not-exist :create
+       :if-exists :supersede))
+
+
+(let* ((z (make-array 12 :element-type '(complex single-float)))
+       )
+  (sb-sys:with-pinned-objects (z)
+   (let ((start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
+     (sb-posix:write (sb-ext::fd-stream-fd *bla*) start-sap (* (/ (* 2 32) 8)
+							       (length z))))))
+
+
+
+1
+;; with storing:
+;; Evaluation took:
+;;   375.340 seconds of real time
+;;   990.958071 seconds of total run time (962.100751 user, 28.857320 system)
+;;   [ Run times consist of 4.830 seconds GC time, and 986.129 seconds non-GC time. ]
+;;   264.02% CPU
+;;   600,541,376,880 processor cycles
+;;   22,705,892,368 bytes consed
+  
+;; without storing:
+;; Evaluation took:
+;;   256.223 seconds of real time
+;;   981.185667 seconds of total run time (971.369248 user, 9.816419 system)
+;;   [ Run times consist of 5.798 seconds GC time, and 975.388 seconds non-GC time. ]
+;;   382.94% CPU
+;;   409,954,965,340 processor cycles
+;;   22,706,930,816 bytes consed
+  
+
+;; Core (SKT) | EXEC | IPC  | FREQ | L2MISS | L2HIT | TEMP
+
+;;    0    0     1.02   1.09   0.93   1030 K    0.83     15
+;;    1    0     1.01   1.09   0.92    913 K    0.84     15
+;;    2    0     0.92   1.00   0.92   2492 K    0.77     22
+;;    3    0     1.01   1.10   0.92    982 K    0.81     22
+;; ---------------------------------------------------------------------------------------------------------------
+;;  TOTAL  *     0.99   1.07   0.93   5419 K    0.80     N/A
+
+;;  Instructions retired:   10 G ; Active cycles: 9891 M ; Time (TSC): 2668 Mticks ; C0 (active,non-halted) core residency: 59.54 %
+
+;;  C1 core residency: 40.04 %; C3 core residency: 0.00 %; C6 core residency: 0.42 %; C7 core residency: 0.00 %;
+;;  C2 package residency: 0.00 %; C4 package residency: 0.00 %; C6 package residency: 0.00 %;
+
+;;  PHYSICAL CORE IPC                 : 1.07 => corresponds to 53.49 % utilization for cores in active state
+;;  Instructions per nominal CPU cycle: 0.99 => corresponds to 49.56 % core utilization over time interval
+;;  SMI count: 0
+;; ---------------------------------------------------------------------------------------------------------------
+;; MEM (GB)->| CPU energy |
+;; ---------------------------------------------------------------------------------------------------------------
+;;  SKT   0       5.92     
+;; ---------------------------------------------------------------------------------------------------------------
+
+;;  EXEC  : instructions per nominal CPU cycle
+;;  IPC   : instructions per CPU cycle
+;;  FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+;;  L2MISS: L2 cache misses 
+;;  L2HIT : L2 cache hit ratio (0.00-1.00)
+;;  TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+;;  energy: Energy in Joules
+
 
 
 ;; 0.008s 341kB
