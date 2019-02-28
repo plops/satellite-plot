@@ -293,3 +293,9 @@ respectively);
 # SAR theory
 
 - a synthetic antenna observes the target in its near field
+
+
+# Sentinel 3 Altimeter
+- http://www.altimetry.info/filestorage/Radar_Altimetry_Tutorial.pdf
+- does it make images?
+
