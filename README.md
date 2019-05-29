@@ -291,3 +291,35 @@ respectively);
 # Sentinel 3 Altimeter
 - http://www.altimetry.info/filestorage/Radar_Altimetry_Tutorial.pdf
 - does it make images?
+
+
+# Processed Sentinel 1 Data:
+
+The SLC dataset contains xml files with orbital data, doppler
+centroid, notes about missing lines.
+https://scihub.copernicus.eu/dhus/odata/v1
+s1b-iw1-slc-vh-20180911t054945-20180911t055010-012663-0175e1-001.xml
+ 
+ 
+```
+<dopplerCentroid>
+    <dcEstimateList count="11">
+      <dcEstimate>
+        <azimuthTime>2018-09-11T05:49:45.174040</azimuthTime>
+        <t0>5.355661901404993e-03</t0>
+        <geometryDcPolynomial count="3">-1.461027e-01 -1.325449e+02 3.609024e+04</geometryDcPolynomial>
+        <dataDcPolynomial count="3">3.575661e+00 8.694445e+03 8.012602e+06</dataDcPolynomial>
+        <dataDcRmsError>9.983446121215820e+00</dataDcRmsError>
+        <dataDcRmsErrorAboveThreshold>false</dataDcRmsErrorAboveThreshold>
+        <fineDceAzimuthStartTime>2018-09-11T05:49:43.785387</fineDceAzimuthStartTime>
+        <fineDceAzimuthStopTime>2018-09-11T05:49:46.562694</fineDceAzimuthStopTime>
+        <fineDceList count="20">
+          <fineDce>
+            <slantRangeTime>5.361878367267955e-03</slantRangeTime>
+            <frequency>1.193894958496094e+01</frequency>
+          </fineDce>
+          <fineDce>
+            <slantRangeTime>5.380714262202410e-03</slantRangeTime>
+            <frequency>9.939724922180176e+00</frequency>
+          </fineDce>
+```
