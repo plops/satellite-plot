@@ -19,11 +19,18 @@ font=QtGui.QFont()
 font.setPointSize(5)
 widget.setFont(font)
 type_header=[]
+short_names=[]
 for c in list(df.columns):
     example=df[c][0]
     example_type=type(example)
     short_name="".join(map(lambda x: x[0], df.columns[0].split("-")))
-    v=(short_name,example_type,)
+    new_short_name=short_name
+    count=0
+    while ((new_short_name in short_names)):
+        count=((1)+(count))
+        new_short_name=((short_name)+(str(count)))
+    short_names.append(new_short_name)
+    v=(new_short_name,example_type,)
     type_header.append(v)
 contents=[]
 for idx, row in df.iterrows():

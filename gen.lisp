@@ -48,7 +48,8 @@
 	  (font.setPointSize 5)
 	  (widget.setFont font))
 	 (do0
-	  (setf type_header (list))
+	  (setf type_header (list)
+		short_names (list))
 	  (for (c ("list" df.columns))
 	       #+nil (do0 (print (+ (string "col: ") c) )
 		    (print (+ (string "        ") (str (aref (aref df c) 0))))
@@ -59,7 +60,13 @@
 				     (join (map (lambda (x) (aref x 0))
 						(dot (aref df.columns 0)
 						     (split (string "-"))))))
-		     v (tuple short_name example_type))
+		     new_short_name short_name
+		     count 0)
+	       (while (in new_short_name short_names)
+		 (setf count (+ 1 count))
+		 (setf new_short_name (+ short_name (str count))))
+	       (short_names.append new_short_name)
+	       (setf v (tuple new_short_name example_type))
 	       
 	       (type_header.append v))
 	  (do0 ;; FIXME: ECC-NUMBER is a string but is not copied
