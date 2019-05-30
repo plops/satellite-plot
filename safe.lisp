@@ -650,7 +650,7 @@ and returns one decoded symbol."
 
 
 (time
- (let* ((nproc 4)
+ (let* ((nproc 1)
 	(lines-per-proc (ceiling (length *headers*) nproc))
 	(chunks (loop for p below nproc collect
 		     (subseq *headers*
