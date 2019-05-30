@@ -25,6 +25,7 @@
 		       (string "SAB-SSB-AZIMUTH-BEAM-ADDRESS")))
 	 ;; find index where elev beam address changes
 	 ;;df.iloc[np.diff(df[df['SAB-SSB-ELEVATION-BEAM-ADDRESS']==6].index)!=1][0]
+	 
 	 (setf w (aref (dot (aref df.iloc
 			      (!= 1 (np.diff
 				     (dot
@@ -45,7 +46,7 @@
 	  (widget.resize 500 500)
 	  (widget.setWindowTitle (string "satellite data header"))
 	  (setf font (QtGui.QFont))
-	  (font.setPointSize 8)
+	  (font.setPointSize 5)
 	  (widget.setFont font))
 	 (do0
 	  (setf type_header (list)
@@ -74,9 +75,25 @@
 	  (do0 ;; FIXME: ECC-NUMBER is a string but is not copied
 	   (setf contents (list)
 		 )
-	   (for ((ntuple idx row) (df.iterrows))
+	   (setf df1 (aref df
+			   (!= 0.0 (dot (aref df
+					      (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))
+					(diff))))
+		 ;; also get index behind and before change
+		 df1i (aref (sorted (+ ("list"
+				   (- df1.index 1)
+				   )
+				  ("list"
+				   df1.index
+				   )
+				  ("list"
+				   (+ df1.index 1)
+				   )))
+			    "1:-1"))
+	   (for ((ntuple idx row)
+		 (dot (aref df.iloc df1i) (iterrows)) )
 		(contents.append ("tuple" row))
-		(if (< 1000 idx)
+		#+nil (if (< 1000 idx)
 		    break)))
 	  (setf data (np.array contents
 				   :dtype type_header)))

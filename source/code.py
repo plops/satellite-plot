@@ -16,7 +16,7 @@ widget.show()
 widget.resize(500, 500)
 widget.setWindowTitle("satellite data header")
 font=QtGui.QFont()
-font.setPointSize(8)
+font.setPointSize(5)
 widget.setFont(font)
 type_header=[]
 short_names=[]
@@ -34,9 +34,9 @@ for c in list(df.columns):
     v=(new_short_name,example_type,)
     type_header.append(v)
 contents=[]
-for idx, row in df.iterrows():
+df1=df[(((0.0e+0))!=(df["SAB-SSB-ELEVATION-BEAM-ADDRESS"].diff()))]
+df1i=sorted(((list(((df1.index)-(1))))+(list(df1.index))+(list(((df1.index)+(1))))))[1:-1]
+for idx, row in df.iloc[df1i].iterrows():
     contents.append(tuple(row))
-    if ( ((1000)<(idx)) ):
-        break
 data=np.array(contents, dtype=type_header)
 widget.setData(data)
