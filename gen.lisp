@@ -34,30 +34,35 @@
 						      (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))))
 				      index))))
 			    index) 0))
+	 #+nil(do0
+	  (imports ((pg pyqtgraph)
+		    ))
+	  "from pyqtgraph.Qt import QtCore, QtGui"
 
-	 (imports ((pg pyqtgraph)
-		   ))
-	 "from pyqtgraph.Qt import QtCore, QtGui"
-
-	 (setf app (QtGui.QApplication (list))
-	       widget (pg.TableWidget))
-	 (widget.show)
-	 (widget.resize 500 500)
-	 (widget.setWindowTitle (string "satellite data header"))
+	  (setf app (QtGui.QApplication (list))
+		widget (pg.TableWidget))
+	  (widget.show)
+	  (widget.resize 500 500)
+	  (widget.setWindowTitle (string "satellite data header")))
 	 (do0
-	  (setf res (list))
+	  (setf type_header (list))
 	  (for (c ("list" df.columns))
-	       (print (+ (string "col: ") c) )
-	       (print (aref (aref df c) 0))
-	       (print (type (aref (aref df c) 0)))
+	       #+nil (do0 (print (+ (string "col: ") c) )
+		    (print (+ (string "        ") (str (aref (aref df c) 0))))
+		    (print (+ (string "        ") (str (type (aref (aref df c) 0))))))
 	       (setf example (aref (aref df c) 0)
 		     example_type (type example)
 		     v (tuple c example_type))
 	       
-	       (res.append v))
-	  (setf data (np.array df.values
-				   :dtype res)))
-	 (widget.setData data)
+	       (type_header.append v))
+	  (do0
+	   (setf contents (list)
+		 )
+	   (for ((ntuple idx row) (df.iterrows))
+		(contents.append ("tuple" row))))
+	  (setf data (np.array contents
+				   :dtype type_header)))
+	 #+nil (widget.setData data)
 	 #+nil
 	 (do0
           (setf a (dot (np.fromfile (string "/home/martin/sat-data/chunk0")
