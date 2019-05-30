@@ -23,7 +23,7 @@ short_names=[]
 for c in list(df.columns):
     example=df[c][0]
     example_type=type(example)
-    short_name="".join(map(lambda x: x[0], df.columns[0].split("-")))
+    short_name="".join(map(lambda x: x[0], c.split("-")))
     new_short_name=short_name
     count=0
     while ((new_short_name in short_names)):

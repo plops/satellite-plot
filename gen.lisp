@@ -58,7 +58,7 @@
 		     example_type (type example)
 		     short_name (dot (string "")
 				     (join (map (lambda (x) (aref x 0))
-						(dot (aref df.columns 0)
+						(dot c
 						     (split (string "-"))))))
 		     new_short_name short_name
 		     count 0)
