@@ -52,6 +52,8 @@
 		       (string "SAB-SSB-AZIMUTH-BEAM-ADDRESS")))
 	 ;; find index where elev beam address changes
 	 ;;df.iloc[np.diff(df[df['SAB-SSB-ELEVATION-BEAM-ADDRESS']==6].index)!=1][0]
+
+	
 	 
 	 (setf w (aref (dot (aref df.iloc
 			      (!= 1 (np.diff
@@ -64,6 +66,9 @@
 						      (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))))
 				      index))))
 			    index) 0))
+	 (do0
+	  "# relate to tx pulse definition (which is rank pulse repititions before)"
+	  )))
 	 (do0
 	  (imports ((pg pyqtgraph)
 		    ))
