@@ -11,7 +11,7 @@ w=df.iloc[((1)!=(np.diff(df[((6)==(df["SAB-SSB-ELEVATION-BEAM-ADDRESS"]))].index
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 app=QtGui.QApplication([])
-widget=pg.TableWidget()
+widget=pg.TableWidget(sortable=False)
 widget.show()
 widget.resize(500, 500)
 widget.setWindowTitle("satellite data header")
@@ -31,7 +31,7 @@ for c in list(df.columns):
         new_short_name=((short_name)+(str(count)))
     print("{} .. {}".format(new_short_name, c))
     short_names.append(new_short_name)
-    v=(new_short_name,example_type,)
+    v=(c,example_type,)
     type_header.append(v)
 contents=[]
 df1=df[(((0.0e+0))!=(df["SAB-SSB-ELEVATION-BEAM-ADDRESS"].diff()))]

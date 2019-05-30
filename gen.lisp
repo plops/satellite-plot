@@ -4,7 +4,9 @@
 ;; https://www.youtube.com/watch?v=Zz_6P5qAJck
 (in-package :cl-py-generator)
 
-;(start-python)
+					;(start-python)
+
+;; TODO: parse ancillary data
 
 (let ((code
        `(do0
@@ -41,7 +43,7 @@
 	  "from pyqtgraph.Qt import QtCore, QtGui"
 
 	  (setf app (QtGui.QApplication (list))
-		widget (pg.TableWidget))
+		widget (pg.TableWidget :sortable False))
 	  (widget.show)
 	  (widget.resize 500 500)
 	  (widget.setWindowTitle (string "satellite data header"))
@@ -69,7 +71,8 @@
 	       (print (dot (string "{} .. {}")
 			   (format new_short_name c)))
 	       (short_names.append new_short_name)
-	       (setf v (tuple new_short_name example_type))
+	       (setf v (tuple c ;new_short_name
+			      example_type))
 	       
 	       (type_header.append v))
 	  (do0 ;; FIXME: ECC-NUMBER is a string but is not copied
@@ -118,4 +121,4 @@
   ;(run code)
   (write-source "/home/martin/stage/satellite-plot/source/code" code))
 
-
+;; SC packet-sequence-count, starts with 0, wraps around at 16383
