@@ -43,7 +43,10 @@
 		widget (pg.TableWidget))
 	  (widget.show)
 	  (widget.resize 500 500)
-	  (widget.setWindowTitle (string "satellite data header")))
+	  (widget.setWindowTitle (string "satellite data header"))
+	  (setf font (QtGui.QFont))
+	  (font.setPointSize 5)
+	  (widget.setFont font))
 	 (do0
 	  (setf type_header (list))
 	  (for (c ("list" df.columns))
@@ -60,7 +63,7 @@
 		 )
 	   (for ((ntuple idx row) (df.iterrows))
 		(contents.append ("tuple" row))
-		(if (< 100 idx)
+		(if (< 1000 idx)
 		    break)))
 	  (setf data (np.array contents
 				   :dtype type_header)))

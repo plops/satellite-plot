@@ -15,6 +15,9 @@ widget=pg.TableWidget()
 widget.show()
 widget.resize(500, 500)
 widget.setWindowTitle("satellite data header")
+font=QtGui.QFont()
+font.setPointSize(5)
+widget.setFont(font)
 type_header=[]
 for c in list(df.columns):
     example=df[c][0]
@@ -24,7 +27,7 @@ for c in list(df.columns):
 contents=[]
 for idx, row in df.iterrows():
     contents.append(tuple(row))
-    if ( ((100)<(idx)) ):
+    if ( ((1000)<(idx)) ):
         break
 data=np.array(contents, dtype=type_header)
 widget.setData(data)
