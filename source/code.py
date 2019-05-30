@@ -22,7 +22,8 @@ type_header=[]
 for c in list(df.columns):
     example=df[c][0]
     example_type=type(example)
-    v=(c,example_type,)
+    short_name="".join(map(lambda x: x[0], df.columns[0].split("-")))
+    v=(short_name,example_type,)
     type_header.append(v)
 contents=[]
 for idx, row in df.iterrows():

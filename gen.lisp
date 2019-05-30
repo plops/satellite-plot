@@ -55,7 +55,11 @@
 		    (print (+ (string "        ") (str (type (aref (aref df c) 0))))))
 	       (setf example (aref (aref df c) 0)
 		     example_type (type example)
-		     v (tuple c example_type))
+		     short_name (dot (string "")
+				     (join (map (lambda (x) (aref x 0))
+						(dot (aref df.columns 0)
+						     (split (string "-"))))))
+		     v (tuple short_name example_type))
 	       
 	       (type_header.append v))
 	  (do0 ;; FIXME: ECC-NUMBER is a string but is not copied
