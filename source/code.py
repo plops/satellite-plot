@@ -6,6 +6,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 plt.ion()
 df=pd.read_csv("/home/martin/stage/satellite-plot/headers.csv")
+# rename columns to _ instead of -
+new_names={}
+for c in df.columns:
+    new_names[c]=c.replace("-", "_").lower()
+df2=df.rename(new_names, axis="columns")
 n=((2)*(df["NUMBER-OF-QUADS"].iloc[0]))
 w=df.iloc[((1)!=(np.diff(df[((6)==(df["SAB-SSB-ELEVATION-BEAM-ADDRESS"]))].index)))].index[0]
 import pyqtgraph as pg

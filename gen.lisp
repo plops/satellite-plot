@@ -20,6 +20,18 @@
 	 (setf df (pd.read_csv (string ;"/home/martin/sat-data/headers.csv"
 				"/home/martin/stage/satellite-plot/headers.csv"
 				)))
+
+	 (do0
+	  "# rename columns to _ instead of -"
+	  (setf new_names "{}")
+	  (for (c df.columns)
+	       (setf (aref new_names c) (dot c
+					     (replace (string "-")
+							(string "_"))
+					     (lower))))
+	  (setf df2 (df.rename new_names :axis (string "columns"))))
+	 
+	 
 	 (setf n (* 2 (dot (aref df (string "NUMBER-OF-QUADS"))
 			   (aref iloc 0))))
 	 ;; df['SAB-SSB-ELEVATION-BEAM-ADDRESS'].unique() => array([ 6, 11,  7, 12,  8, 15,  9, 10])
