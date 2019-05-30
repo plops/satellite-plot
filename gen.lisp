@@ -17,22 +17,22 @@
 		   (pd pandas)
 		   (plt matplotlib.pyplot)))
 	 (plt.ion)
-	 (setf df (pd.read_csv (string ;"/home/martin/sat-data/headers.csv"
+	 (setf df_ (pd.read_csv (string ;"/home/martin/sat-data/headers.csv"
 				"/home/martin/stage/satellite-plot/headers.csv"
 				)))
 
 	 (do0
 	  "# rename columns to _ instead of -"
 	  (setf new_names "{}")
-	  (for (c df.columns)
+	  (for (c df_.columns)
 	       (setf (aref new_names c) (dot c
 					     (replace (string "-")
 							(string "_"))
 					     (lower))))
-	  (setf df2 (df.rename new_names :axis (string "columns"))))
+	  (setf df (df_.rename new_names :axis (string "columns"))))
 	 
 	 
-	 (setf n (* 2 (dot (aref df (string "NUMBER-OF-QUADS"))
+	 (setf n (* 2 (dot df.number_of_quads
 			   (aref iloc 0))))
 	 ;; df['SAB-SSB-ELEVATION-BEAM-ADDRESS'].unique() => array([ 6, 11,  7, 12,  8, 15,  9, 10])
 	 #+nil (setf q (aref (aref df (== 6 (aref df (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))))
@@ -45,6 +45,8 @@
 				     (dot
 				      (aref df
 					    (== 6
+						df.sab_ssb_elevation_beam_address
+						#+nil
 						(aref df
 						      (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))))
 				      index))))
@@ -74,7 +76,7 @@
 		     short_name (dot (string "")
 				     (join (map (lambda (x) (aref x 0))
 						(dot c
-						     (split (string "-"))))))
+						     (split (string "_"))))))
 		     new_short_name short_name
 		     count 0)
 	       (while (in new_short_name short_names)
@@ -91,7 +93,8 @@
 	   (setf contents (list)
 		 )
 	   (setf df1 (aref df
-			   (!= 0.0 (dot (aref df
+			   (!= 0.0 (dot df.sab_ssb_elevation_beam_address
+					#+nil (aref df
 					      (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))
 					(diff))))
 		 ;; also get index behind and before change
