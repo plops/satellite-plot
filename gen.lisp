@@ -34,7 +34,7 @@
 						      (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))))
 				      index))))
 			    index) 0))
-	 #+nil(do0
+	 (do0
 	  (imports ((pg pyqtgraph)
 		    ))
 	  "from pyqtgraph.Qt import QtCore, QtGui"
@@ -55,14 +55,16 @@
 		     v (tuple c example_type))
 	       
 	       (type_header.append v))
-	  (do0
+	  (do0 ;; FIXME: ECC-NUMBER is a string but is not copied
 	   (setf contents (list)
 		 )
 	   (for ((ntuple idx row) (df.iterrows))
-		(contents.append ("tuple" row))))
+		(contents.append ("tuple" row))
+		(if (< 100 idx)
+		    break)))
 	  (setf data (np.array contents
 				   :dtype type_header)))
-	 #+nil (widget.setData data)
+	 (widget.setData data)
 	 #+nil
 	 (do0
           (setf a (dot (np.fromfile (string "/home/martin/sat-data/chunk0")
