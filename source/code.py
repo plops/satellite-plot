@@ -16,7 +16,7 @@ widget.show()
 widget.resize(500, 500)
 widget.setWindowTitle("satellite data header")
 font=QtGui.QFont()
-font.setPointSize(5)
+font.setPointSize(8)
 widget.setFont(font)
 type_header=[]
 short_names=[]
@@ -29,6 +29,7 @@ for c in list(df.columns):
     while ((new_short_name in short_names)):
         count=((1)+(count))
         new_short_name=((short_name)+(str(count)))
+    print("{} .. {}".format(new_short_name, c))
     short_names.append(new_short_name)
     v=(new_short_name,example_type,)
     type_header.append(v)

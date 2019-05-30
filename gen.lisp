@@ -45,7 +45,7 @@
 	  (widget.resize 500 500)
 	  (widget.setWindowTitle (string "satellite data header"))
 	  (setf font (QtGui.QFont))
-	  (font.setPointSize 5)
+	  (font.setPointSize 8)
 	  (widget.setFont font))
 	 (do0
 	  (setf type_header (list)
@@ -65,6 +65,8 @@
 	       (while (in new_short_name short_names)
 		 (setf count (+ 1 count))
 		 (setf new_short_name (+ short_name (str count))))
+	       (print (dot (string "{} .. {}")
+			   (format new_short_name c)))
 	       (short_names.append new_short_name)
 	       (setf v (tuple new_short_name example_type))
 	       
