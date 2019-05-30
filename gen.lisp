@@ -31,6 +31,12 @@
 					     (lower))))
 	  (setf df (df_.rename new_names :axis (string "columns"))))
 	 
+
+	 (do0
+	  "# collect sub-commutated data"
+	  (setf sub_start (aref (aref df.index (== df.sub_commutated_index 1)) 0))
+	  (setf sub_data (aref df.sub_commutated_data (slice sub_start
+							     (+ sub_start 64)))))
 	 
 	 (setf n (* 2 (dot df.number_of_quads
 			   (aref iloc 0))))

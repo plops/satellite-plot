@@ -11,6 +11,9 @@ new_names={}
 for c in df_.columns:
     new_names[c]=c.replace("-", "_").lower()
 df=df_.rename(new_names, axis="columns")
+# collect sub-commutated data
+sub_start=df.index[((df.sub_commutated_index)==(1))][0]
+sub_data=df.sub_commutated_data[sub_start:((sub_start)+(64))]
 n=((2)*(df.number_of_quads.iloc[0]))
 w=df.iloc[((1)!=(np.diff(df[((6)==(df.sab_ssb_elevation_beam_address))].index)))].index[0]
 import pyqtgraph as pg
