@@ -88,10 +88,16 @@
 	 (do0
 	  "# compute human readable values from the transmitted codes"
 	  (setf f_ref_MHz 37.53472224)
-	  ,@(let ((l `((sampling_window_start_time us (lambda (code) (/ code f_ref_MHz)))
+	  ,@(let ((l `((rx_gain dB (lambda (code) (* -.5 code)))
+		       (sampling_window_start_time us (lambda (code) (/ code f_ref_MHz)))
 		       (sampling_window_length us (lambda (code) (/ code f_ref_MHz)))
 		       (old_tx_pulse_length us (lambda (code) (/ code f_ref_MHz)))
 		       (pulse_repetition_intervall us (lambda (code) (/ code f_ref_MHz))) ;; vary between swath
+		       (old_tx_ramp_rate_magnitude MHz_per_us (lambda (code) (* ; (** -1 (~ (& code 1)))
+									    code
+									    (/ (** f_ref_MHz 2)
+									       (** 2 21)) 
+									    )))
 		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
@@ -99,7 +105,8 @@
 		      `(do0
 			(setf (aref df (string ,hr-name))
 			      (dot (aref df (string ,name)) (apply ,fun ; :axis 1
-								   )))))))))
+								   ))))))))
+	  )
 	 (do0
 	  (imports ((pg pyqtgraph)
 		    ))
