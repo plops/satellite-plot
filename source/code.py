@@ -25,3 +25,4 @@ df["old_tx_ramp_rate_magnitude"]=df.tx_ramp_rate_magnitude.iloc[((df.index)-(df[
 df["old_tx_pulse_start_frequency_polarity"]=df.tx_pulse_start_frequency_polarity.iloc[((df.index)-(df["rank"]))].values
 df["old_tx_pulse_start_frequency_magnitude"]=df.tx_pulse_start_frequency_magnitude.iloc[((df.index)-(df["rank"]))].values
 df["old_tx_pulse_length"]=df.tx_pulse_length.iloc[((df.index)-(df["rank"]))].values
+df["old_ses_ssb_tx_pulse_number"]=df.ses_ssb_tx_pulse_number.iloc[((df.index)-(df["rank"]))].values
