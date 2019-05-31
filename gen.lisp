@@ -74,12 +74,18 @@
 		       )))
 	      (loop for e in l collect
 		   (let ((name (format nil "old_~a" e)))
-		    `(do0
-		      (setf (aref df (string ,name)) 0)
-		      (for ((ntuple idx row) (df.iterrows))
-			   (print idx)
-			   (setf (dot (aref df (string ,name)) (aref iloc idx))
-				 (dot (aref df (string ,e)) (aref iloc (- idx (aref row (string "rank")))))))))))))))
+		     `(do0
+		       (setf
+			;(aref df (string ,name)) 0
+			(aref df (string ,name))
+			(dot df ,e
+			     (aref iloc (- df.index (aref df (string "rank"))))
+			     values)))
+		     #+nil(do0
+			 (setf )
+			 (for ((ntuple idx row) (df.iterrows))
+			      (setf (dot (aref df (string ,name)) (aref iloc idx))
+				    (dot (aref df (string ,e)) (aref iloc (- idx (aref row (string "rank")))))))))))))))
   ;(run code)
   (write-source "/home/martin/stage/satellite-plot/source/code" code))
 

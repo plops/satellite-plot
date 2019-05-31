@@ -20,7 +20,4 @@ temperature_hk_data=sub_data[41:64]
 n=((2)*(df.number_of_quads.iloc[0]))
 w=df.iloc[((1)!=(np.diff(df[((6)==(df.sab_ssb_elevation_beam_address))].index)))].index[0]
 # relate to tx pulse definition (which is rank pulse repititions before)
-df["old_tx_ramp_rate_magnitude"]=0
-for idx, row in df.iterrows():
-    print(idx)
-    df["old_tx_ramp_rate_magnitude"].iloc[idx]=df["tx_ramp_rate_magnitude"].iloc[((idx)-(row["rank"]))]
+df["old_tx_ramp_rate_magnitude"]=df.tx_ramp_rate_magnitude.iloc[((df.index)-(df["rank"]))].values
