@@ -69,23 +69,19 @@
 	 (do0
 	  "# relate to tx pulse definition (which is rank pulse repititions before)"
 	  ;; sampling window start
-	  ,@(let ((l `(tx_ramp_rate_magnitude
-		       ;tx_ram_rate_polarity
-		       )))
+	  ,@(let ((l `(tx_ramp_rate_polarity
+		       tx_ramp_rate_magnitude
+		       tx_pulse_start_frequency_polarity
+		       tx_pulse_start_frequency_magnitude
+		       tx_pulse_length)))
 	      (loop for e in l collect
 		   (let ((name (format nil "old_~a" e)))
 		     `(do0
 		       (setf
-			;(aref df (string ,name)) 0
 			(aref df (string ,name))
 			(dot df ,e
 			     (aref iloc (- df.index (aref df (string "rank"))))
-			     values)))
-		     #+nil(do0
-			 (setf )
-			 (for ((ntuple idx row) (df.iterrows))
-			      (setf (dot (aref df (string ,name)) (aref iloc idx))
-				    (dot (aref df (string ,e)) (aref iloc (- idx (aref row (string "rank")))))))))))))))
+			     values))))))))))
   ;(run code)
   (write-source "/home/martin/stage/satellite-plot/source/code" code))
 

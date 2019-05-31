@@ -20,4 +20,8 @@ temperature_hk_data=sub_data[41:64]
 n=((2)*(df.number_of_quads.iloc[0]))
 w=df.iloc[((1)!=(np.diff(df[((6)==(df.sab_ssb_elevation_beam_address))].index)))].index[0]
 # relate to tx pulse definition (which is rank pulse repititions before)
+df["old_tx_ramp_rate_polarity"]=df.tx_ramp_rate_polarity.iloc[((df.index)-(df["rank"]))].values
 df["old_tx_ramp_rate_magnitude"]=df.tx_ramp_rate_magnitude.iloc[((df.index)-(df["rank"]))].values
+df["old_tx_pulse_start_frequency_polarity"]=df.tx_pulse_start_frequency_polarity.iloc[((df.index)-(df["rank"]))].values
+df["old_tx_pulse_start_frequency_magnitude"]=df.tx_pulse_start_frequency_magnitude.iloc[((df.index)-(df["rank"]))].values
+df["old_tx_pulse_length"]=df.tx_pulse_length.iloc[((df.index)-(df["rank"]))].values
