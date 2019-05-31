@@ -74,7 +74,7 @@
 		       tx_pulse_start_frequency_polarity
 		       tx_pulse_start_frequency_magnitude
 		       tx_pulse_length
-		       ses_ssb_tx_pulse_number
+		       ses_ssb_tx_pulse_number 
 		       )))
 	      (loop for e in l collect
 		   (let ((name (format nil "old_~a" e)))
