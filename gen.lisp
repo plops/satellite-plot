@@ -74,7 +74,7 @@
 		       tx_pulse_start_frequency_polarity
 		       tx_pulse_start_frequency_magnitude
 		       tx_pulse_length
-		       ses_ssb_tx_pulse_number 
+		       ses_ssb_tx_pulse_number
 		       )))
 	      (loop for e in l collect
 		   (let ((name (format nil "old_~a" e)))
@@ -88,6 +88,7 @@
 	 (do0
 	  "# compute human readable values from the transmitted codes"
 	  (setf f_ref_MHz 37.53472224)
+	  "# compute columns that only access one other column with coded data"
 	  ,@(let ((l `((rx_gain dB (lambda (code) (* -.5 code)))
 		       (sampling_window_start_time us (lambda (code) (/ code f_ref_MHz)))
 		       (sampling_window_length us (lambda (code) (/ code f_ref_MHz)))
@@ -98,6 +99,11 @@
 									    (/ (** f_ref_MHz 2)
 									       (** 2 21)) 
 									    )))
+		       (old_tx_pulse_start_frequency_magnitude MHz (lambda (code)
+								     (* code
+									    (/ f_ref_MHz
+									       (** 2 14)) 
+									    )) )
 		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
@@ -106,7 +112,25 @@
 			(setf (aref df (string ,hr-name))
 			      (dot (aref df (string ,name)) (apply ,fun ; :axis 1
 								   ))))))))
-	  )
+	  "# compute columns that need to access several other columns for decoding"
+	  ,@(let ((l `((old_tx_ramp_rate MHz_per_us (lambda (row)
+						      (* (** -1 (- 1 (aref row (string "old_tx_ramp_rate_polarity"))))
+							 (aref row (string "old_tx_ramp_rate_magnitude"))))
+					 )
+		       (old_tx_pulse_start_frequency MHz (lambda (row)
+							   (+ (/ (aref row (string "old_tx_ramp_rate_hr_MHz_per_us"))
+								 (* 4 f_ref_MHz))
+							      (* (** -1 (- 1
+									   (aref row (string "old_tx_pulse_start_frequency_polarity"))))
+								 (aref row (string "old_tx_pulse_start_frequency_magnitude_hr_MHz"))))))
+		       )))
+	      (loop for e in l collect
+		   (destructuring-bind (name unit fun) e
+		     (let ((hr-name (format nil "~a_hr_~a" name unit)))
+		      `(do0
+			(setf (aref df (string ,hr-name))
+			      (dot df (apply ,fun  :axis 1
+								   )))))))))
 	 (do0
 	  (imports ((pg pyqtgraph)
 		    ))

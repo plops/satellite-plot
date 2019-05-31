@@ -28,12 +28,17 @@ df["old_tx_pulse_length"]=df.tx_pulse_length.iloc[((df.index)-(df["rank"]))].val
 df["old_ses_ssb_tx_pulse_number"]=df.ses_ssb_tx_pulse_number.iloc[((df.index)-(df["rank"]))].values
 # compute human readable values from the transmitted codes
 f_ref_MHz=(3.7534721374511715e+1)
+# compute columns that only access one other column with coded data
 df["rx_gain_hr_dB"]=df["rx_gain"].apply(lambda code: (((-5.e-1))*(code)))
 df["sampling_window_start_time_hr_us"]=df["sampling_window_start_time"].apply(lambda code: ((code)/(f_ref_MHz)))
 df["sampling_window_length_hr_us"]=df["sampling_window_length"].apply(lambda code: ((code)/(f_ref_MHz)))
 df["old_tx_pulse_length_hr_us"]=df["old_tx_pulse_length"].apply(lambda code: ((code)/(f_ref_MHz)))
 df["pulse_repetition_intervall_hr_us"]=df["pulse_repetition_intervall"].apply(lambda code: ((code)/(f_ref_MHz)))
 df["old_tx_ramp_rate_magnitude_hr_MHz_per_us"]=df["old_tx_ramp_rate_magnitude"].apply(lambda code: ((code)*(((((f_ref_MHz)**(2)))/(((2)**(21)))))))
+df["old_tx_pulse_start_frequency_magnitude_hr_MHz"]=df["old_tx_pulse_start_frequency_magnitude"].apply(lambda code: ((code)*(((f_ref_MHz)/(((2)**(14)))))))
+# compute columns that need to access several other columns for decoding
+df["old_tx_ramp_rate_hr_MHz_per_us"]=df.apply(lambda row: ((((-1)**(((1)-(row["old_tx_ramp_rate_polarity"])))))*(row["old_tx_ramp_rate_magnitude"])), axis=1)
+df["old_tx_pulse_start_frequency_hr_MHz"]=df.apply(lambda row: ((((row["old_tx_ramp_rate_hr_MHz_per_us"])/(((4)*(f_ref_MHz)))))+(((((-1)**(((1)-(row["old_tx_pulse_start_frequency_polarity"])))))*(row["old_tx_pulse_start_frequency_magnitude_hr_MHz"])))), axis=1)
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 app=QtGui.QApplication([])
