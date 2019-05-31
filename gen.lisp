@@ -83,17 +83,7 @@
 			(aref df (string ,name))
 			(dot df ,e
 			     (aref iloc (- df.index (aref df (string "rank"))))
-			     values))))))))))
-  ;(run code)
-  (write-source "/home/martin/stage/satellite-plot/source/code" code))
-
-;; SC packet-sequence-count, starts with 0, wraps around at 16383
-
-
-
-#+nil
-(do0
-	 #+nil
+			     values)))))))
 	 (do0
 	  (imports ((pg pyqtgraph)
 		    ))
@@ -108,7 +98,6 @@
 	  (font.setPointSize 5)
 	  (widget.setFont font))
 
-	 #+nil
 	 (do0
 	  (setf type_header (list)
 		short_names (list))
@@ -136,12 +125,9 @@
 	       
 	       (type_header.append v))
 	  (do0 ;; FIXME: ECC-NUMBER is a string but is not copied
-	   (setf contents (list)
-		 )
+	   (setf contents (list))
 	   (setf df1 (aref df
 			   (!= 0.0 (dot df.sab_ssb_elevation_beam_address
-					#+nil (aref df
-						    (string "SAB-SSB-ELEVATION-BEAM-ADDRESS"))
 					(diff))))
 		 ;; also get index behind and before change
 		 df1i (aref (sorted (+ ("list"
@@ -157,18 +143,24 @@
 	   (for ((ntuple idx row)
 		 (dot (aref df.iloc df1i) (iterrows)) )
 		(contents.append ("tuple" row))
-		#+nil (if (< 1000 idx)
-			  break)))
+		))
 	  (setf data (np.array contents
 			       :dtype type_header))
+	  (widget.setData data)
 
 	  )
-	 (widget.setData data)
 	 
-	 
-	 
-	 
-	 
+	 )))
+
+  (write-source "/home/martin/stage/satellite-plot/source/code" code))
+
+;; SC packet-sequence-count, starts with 0, wraps around at 16383
+
+
+
+#+nil
+(do0
+	 	 
 	 #+nil
 	 (do0
 	  (setf a (dot (np.fromfile (string "/home/martin/sat-data/chunk0")
