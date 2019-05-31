@@ -118,7 +118,7 @@
   (tx-pulse-length 0 :type 24)
   (ignore-3 0 :type 3)
   (rank 0 :type 5)
-  (pulse-repetition-intervall 0 :type 24)
+  (pulse-repetition-interval 0 :type 24)
   (sampling-window-start-time 0 :type 24)
   (sampling-window-length 0 :type 24)
   ;;(sab-ssb-message 0 :type 24)
