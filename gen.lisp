@@ -137,7 +137,7 @@
 									  (aref row (string "filter_output_offset_hr_samples"))
 									  17)))
 		       (sampling_window_length_c samples (lambda (row) (- (aref row (string "sampling_window_length_b_hr_samples"))
-									  (* (aref row (string "range_decimation_ratio_hr_m"))
+				1					  (* (aref row (string "range_decimation_ratio_hr_m"))
 									     (// (aref row (string "sampling_window_length_b_hr_samples"))
 										 (aref row (string "range_decimation_ratio_hr_m")))))))
 		       ;; table 5.1-1 tables of value d as function of c and range decimation
@@ -162,16 +162,15 @@
 							     ()
 							     ()
 							     ())))
-						  `(lambda (row) (aref
-								  (np.array
-								   (list
-								    ,@(loop for col in tbl and d from 0 upto 16 collect
-									   `(list
-									     ,@(loop for e in col and c from 0 upto 25  collect
-										  e)))))
-								  (aref row (string ""))
-								  (aref row (string "range_decimation"))
-								  ))))
+						  `(lambda (row)
+						     (dot
+						      (pd.DataFrame
+						       (list ,@(loop for col in tbl and range_decimation from 0 upto 16 collect
+								    (loop for d in col and c from 0 upto 25  collect
+									 `(dict ((string "c") ,c)
+										((string "range_decimation") ,d)
+										((string "d") ,d))))))
+						      (set_index (string "c"))))))
 		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
