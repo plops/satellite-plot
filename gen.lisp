@@ -141,7 +141,7 @@
 									     (// (aref row (string "sampling_window_length_b_hr_samples"))
 										 (aref row (string "range_decimation_ratio_hr_m")))))))
 		       ;; table 5.1-1 tables of value d as function of c and range decimation
-		       (sampling_window_length n3_rx_complex_samples_after_decimation
+		       (sampling_window_length_d samples
 					       ;; rgdec .. range_decimation = filter_number [ 9,  0,  8, 11]
 					       ;; l m
 					       ;; filter_output_offset
@@ -177,6 +177,18 @@
 						      
 						      (aref row (string "sampling_window_length_c_hr_samples"))
 						      (aref row (string "range_decimation"))))))
+		       (sampling_window_length n3_rx_complex_samples_after_decimation
+					       ;; rgdec .. range_decimation = filter_number [ 9,  0,  8, 11]
+					       ;; l m
+					       ;; filter_output_offset
+
+					       (lambda (row)
+						 (* 2 (+ 1
+
+							 (aref row (string "sampling_window_length_d_hr_samples"))
+							 (* (aref row (string "range_decimation_ratio_hr_l"))
+							    (// (aref row (string "sampling_window_length_b_hr_samples"))
+								(aref row (string "range_decimation_ratio_hr_m"))))))))
 		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
