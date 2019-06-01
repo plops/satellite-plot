@@ -123,6 +123,7 @@
 							      (* (** -1 (- 1
 									   (aref row (string "old_tx_pulse_start_frequency_polarity"))))
 								 (aref row (string "old_tx_pulse_start_frequency_magnitude_hr_MHz"))))))
+		       ;; FIXME: speedup is possible. i think these values are constant in a swath
 		       ;; 3.2.5.4
 		       (range_decimation_ratio l (lambda (row) (aref (np.array (list 3 2 0 5 4 3 1 1 3  5  3  4))
 								     (aref row (string "range_decimation")))))
