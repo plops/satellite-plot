@@ -38,12 +38,15 @@ df["old_tx_pulse_length_hr_us"]=df["old_tx_pulse_length"].apply(lambda code: ((c
 df["pulse_repetition_intervall_hr_us"]=df["pulse_repetition_intervall"].apply(lambda code: ((code)/(f_ref_MHz)))
 df["old_tx_ramp_rate_magnitude_hr_MHz_per_us"]=df["old_tx_ramp_rate_magnitude"].apply(lambda code: ((code)*(((((f_ref_MHz)**(2)))/(((2)**(21)))))))
 df["old_tx_pulse_start_frequency_magnitude_hr_MHz"]=df["old_tx_pulse_start_frequency_magnitude"].apply(lambda code: ((code)*(((f_ref_MHz)/(((2)**(14)))))))
-df["range_decimation_ratio_hr_l"]=df["range_decimation_ratio"].apply(lambda code: np.array([3, 2, 0, 5, 4, 3, 1, 1, 3, 5, 3, 4])[code])
-df["range_decimation_ratio_hr_m"]=df["range_decimation_ratio"].apply(lambda code: np.array([4, 3, 0, 9, 9, 8, 3, 6, 7, 16, 26, 11])[code])
 # compute columns that need to access several other columns for decoding
 df["old_tx_ramp_rate_hr_MHz_per_us"]=df.apply(lambda row: ((((-1)**(((1)-(row["old_tx_ramp_rate_polarity"])))))*(row["old_tx_ramp_rate_magnitude"])), axis=1)
-df["old_tx_pulse_start_frequency_hr_MHz"]=df.apply(lambda row: ((((row["old_tx_ramp_rate_hr_MHz_per_us"])/(((4)*(f_ref_MHz)))))+(((((-1)**(((1)-(row["old_tx_pulse_start_frequency_polarity"])))))*(row["old_tx_pulse_start_frequency_magnitude_MHz"])))), axis=1)
-df["sampling_window_length_hr_n3_rx_complex_samples_after_decimation"]=df.apply(lambda row: ((4)*(code)), axis=1)
+df["old_tx_pulse_start_frequency_hr_MHz"]=df.apply(lambda row: ((((row["old_tx_ramp_rate_hr_MHz_per_us"])/(((4)*(f_ref_MHz)))))+(((((-1)**(((1)-(row["old_tx_pulse_start_frequency_polarity"])))))*(row["old_tx_pulse_start_frequency_magnitude_hr_MHz"])))), axis=1)
+df["range_decimation_ratio_hr_l"]=df.apply(lambda row: np.array([3, 2, 0, 5, 4, 3, 1, 1, 3, 5, 3, 4])[row["range_decimation"]], axis=1)
+df["range_decimation_ratio_hr_m"]=df.apply(lambda row: np.array([4, 3, 0, 9, 9, 8, 3, 6, 7, 16, 26, 11])[row["range_decimation"]], axis=1)
+df["filter_output_offset_hr_samples"]=df.apply(lambda row: np.array([87, 87, 0, 88, 90, 92, 93, 103, 89, 97, 110, 91, 0, 0, 0, 0, 0])[row["range_decimation"]], axis=1)
+df["sampling_window_length_b_hr_samples"]=df.apply(lambda row: ((((2)*(row["sampling_window_length"])))-(row["filter_output_offset_hr_samples"])-(17)), axis=1)
+df["sampling_window_length_c_hr_samples"]=df.apply(lambda row: ((row["sampling_window_length_b_hr_samples"])-(((row["range_decimation_ratio_hr_m"])*(((row["sampling_window_length_b_hr_samples"])//(row["range_decimation_ratio_hr_m"])))))), axis=1)
+df["sampling_window_length_hr_n3_rx_complex_samples_after_decimation"]=df.apply(lambda row: np.array([[1, 1, 2, 3], [1, 1, 2], [], [1, 1, 2, 2, 3, 3, 4, 4, 5], [0, 1, 1, 2, 2, 3, 3, 4, 4], [0, 1, 1, 1, 2, 2, 3, 3], [0, 0, 1], [0, 0, 0, 0, 0, 1], [0, 1, 1, 2, 2, 3, 3], [0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5], [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3], [0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4], [], [], [], [], []])[row[""],row["range_decimation"]], axis=1)
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 app=QtGui.QApplication([])

@@ -105,8 +105,7 @@
 								     (* code
 									    (/ f_ref_MHz
 									       (** 2 14)))))
-		       (range_decimation_ratio l (lambda (code) (aref (np.array (list 3 2 0 5 4 3 1 1 3  5  3  4)) code)))
-		       (range_decimation_ratio m (lambda (code) (aref (np.array (list 4 3 0 9 9 8 3 6 7 16 26 11)) code))))))
+		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
 		     (let ((hr-name (format nil "~a_hr_~a" name unit)))
@@ -123,14 +122,56 @@
 								 (* 4 f_ref_MHz))
 							      (* (** -1 (- 1
 									   (aref row (string "old_tx_pulse_start_frequency_polarity"))))
-								 (aref row (string "old_tx_pulse_start_frequency_magnitude_MHz"))))))
+								 (aref row (string "old_tx_pulse_start_frequency_magnitude_hr_MHz"))))))
+		       ;; 3.2.5.4
+		       (range_decimation_ratio l (lambda (row) (aref (np.array (list 3 2 0 5 4 3 1 1 3  5  3  4))
+								     (aref row (string "range_decimation")))))
+		       (range_decimation_ratio m (lambda (row) (aref (np.array (list 4 3 0 9 9 8 3 6 7 16 26 11))
+								     (aref row (string "range_decimation")))))
+		       ;; table 5.1-2 filter output offset
+		       (filter_output_offset samples (lambda (row) (aref (np.array (list 87 87 0 88 90 92 93 103 89 97 110 91 0 0 0 0 0))
+									 (aref row (string "range_decimation")))))
+		       
+		       ;; 3.2.5.12
+		       (sampling_window_length_b samples (lambda (row) (- (* 2 (aref row (string "sampling_window_length")))
+									  (aref row (string "filter_output_offset_hr_samples"))
+									  17)))
+		       (sampling_window_length_c samples (lambda (row) (- (aref row (string "sampling_window_length_b_hr_samples"))
+									  (* (aref row (string "range_decimation_ratio_hr_m"))
+									     (// (aref row (string "sampling_window_length_b_hr_samples"))
+										 (aref row (string "range_decimation_ratio_hr_m")))))))
+		       ;; table 5.1-1 tables of value d as function of c and range decimation
 		       (sampling_window_length n3_rx_complex_samples_after_decimation
 					       ;; rgdec .. range_decimation = filter_number [ 9,  0,  8, 11]
 					       ;; l m
 					       ;; filter_output_offset
-
-					       
-					       (lambda (row) (* 4 code)))
+					       ,(let ((tbl `((1 1 2 3) ;; range_decimation = 0, c = 0,1,2,3
+							     (1 1 2) ;; range_decimation = 1, c = 0,1,2
+							     ()
+							     (1 1 2 2 3 3 4 4 5)
+							     (0 1 1 2 2 3 3 4 4)
+							     (0 1 1 1 2 2 3 3)
+							     (0 0 1)
+							     (0 0 0 0 0 1)
+							     (0 1 1 2 2 3 3)
+							     (0 0 1 1 1 2 2 2 2 3 3 3 4 4 4 5)
+							     (0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 2 2 2 2  2 2 2 2  3 3)
+							     (0 1 1 1 2 2 3 3 3 4 4)
+							     ()
+							     ()
+							     ()
+							     ()
+							     ())))
+						  `(lambda (row) (aref
+								  (np.array
+								   (list
+								    ,@(loop for col in tbl and d from 0 upto 16 collect
+									   `(list
+									     ,@(loop for e in col and c from 0 upto 25  collect
+										  e)))))
+								  (aref row (string ""))
+								  (aref row (string "range_decimation"))
+								  ))))
 		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
