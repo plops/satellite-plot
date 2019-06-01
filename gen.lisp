@@ -92,6 +92,8 @@
 	  ,@(let ((l `((rx_gain dB (lambda (code) (* -.5 code)))
 		       (sampling_window_start_time us (lambda (code) (/ code f_ref_MHz)))
 		       (sampling_window_length us (lambda (code) (/ code f_ref_MHz)))
+		       (sampling_window_length n1_rx_samples_at_adc_output (lambda (code) (* 8 code)))
+		       (sampling_window_length n2_rx_complex_samples_at_ddc_output (lambda (code) (* 4 code)))
 		       (old_tx_pulse_length us (lambda (code) (/ code f_ref_MHz)))
 		       (pulse_repetition_intervall us (lambda (code) (/ code f_ref_MHz))) ;; vary between swath
 		       (old_tx_ramp_rate_magnitude MHz_per_us (lambda (code) (* ; (** -1 (~ (& code 1)))
@@ -115,22 +117,27 @@
 	  "# compute columns that need to access several other columns for decoding"
 	  ,@(let ((l `((old_tx_ramp_rate MHz_per_us (lambda (row)
 						      (* (** -1 (- 1 (aref row (string "old_tx_ramp_rate_polarity"))))
-							 (aref row (string "old_tx_ramp_rate_magnitude"))))
-					 )
+							 (aref row (string "old_tx_ramp_rate_magnitude")))))
 		       (old_tx_pulse_start_frequency MHz (lambda (row)
 							   (+ (/ (aref row (string "old_tx_ramp_rate_hr_MHz_per_us"))
 								 (* 4 f_ref_MHz))
 							      (* (** -1 (- 1
 									   (aref row (string "old_tx_pulse_start_frequency_polarity"))))
-								 (aref row (string "old_tx_pulse_start_frequency_magnitude_hr_MHz"))))))
+								 (aref row (string "old_tx_pulse_start_frequency_magnitude_MHz"))))))
+		       (sampling_window_length n3_rx_complex_samples_after_decimation
+					       ;; rgdec .. range_decimation [ 9,  0,  8, 11]
+					       ;; l m
+					       ;; filter_output_offset
+
+					       
+					       (lambda (row) (* 4 code)))
 		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
 		     (let ((hr-name (format nil "~a_hr_~a" name unit)))
 		      `(do0
 			(setf (aref df (string ,hr-name))
-			      (dot df (apply ,fun  :axis 1
-								   )))))))))
+			      (dot df (apply ,fun  :axis 1)))))))))
 	 (do0
 	  (imports ((pg pyqtgraph)
 		    ))
