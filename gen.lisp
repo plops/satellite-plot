@@ -163,14 +163,20 @@
 							     ()
 							     ())))
 						  `(lambda (row)
-						     (dot
-						      (pd.DataFrame
+						     (aref 
+						      (np.array
 						       (list ,@(loop for col in tbl and range_decimation from 0 upto 16 collect
-								    (loop for d in col and c from 0 upto 25  collect
-									 `(dict ((string "c") ,c)
-										((string "range_decimation") ,d)
-										((string "d") ,d))))))
-						      (set_index (string "c"))))))
+								    `(list ,@(loop for d in
+										  (subseq
+										   (concatenate 'list
+												col
+												(loop for i below 26 collect 0))
+										   0 26)
+										and c from 0 upto 25  collect
+									d)))))
+						      
+						      (aref row (string "sampling_window_length_c_hr_samples"))
+						      (aref row (string "range_decimation"))))))
 		       )))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
@@ -271,3 +277,4 @@
 					;(np.log (+ .001 (np.abs k)))
 		      )
 	  (ax.set_aspect (string "auto"))))
+
