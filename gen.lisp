@@ -104,9 +104,9 @@
 		       (old_tx_pulse_start_frequency_magnitude MHz (lambda (code)
 								     (* code
 									    (/ f_ref_MHz
-									       (** 2 14)) 
-									    )) )
-		       )))
+									       (** 2 14)))))
+		       (range_decimation_ratio l (lambda (code) (aref (np.array (list 3 2 0 5 4 3 1 1 3  5  3  4)) code)))
+		       (range_decimation_ratio m (lambda (code) (aref (np.array (list 4 3 0 9 9 8 3 6 7 16 26 11)) code))))))
 	      (loop for e in l collect
 		   (destructuring-bind (name unit fun) e
 		     (let ((hr-name (format nil "~a_hr_~a" name unit)))
@@ -125,7 +125,7 @@
 									   (aref row (string "old_tx_pulse_start_frequency_polarity"))))
 								 (aref row (string "old_tx_pulse_start_frequency_magnitude_MHz"))))))
 		       (sampling_window_length n3_rx_complex_samples_after_decimation
-					       ;; rgdec .. range_decimation [ 9,  0,  8, 11]
+					       ;; rgdec .. range_decimation = filter_number [ 9,  0,  8, 11]
 					       ;; l m
 					       ;; filter_output_offset
 
