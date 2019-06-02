@@ -99,7 +99,7 @@
 		       (sampling_window_length n1_rx_samples_at_adc_output (lambda (code) (* 8 code)))
 		       (sampling_window_length n2_rx_complex_samples_at_ddc_output (lambda (code) (* 4 code)))
 		       (old_tx_pulse_length us (lambda (code) (/ code f_ref_MHz)))
-		       (pulse_repetition_intervall us (lambda (code) (/ code f_ref_MHz))) ;; vary between swath
+		       (pulse_repetition_interval us (lambda (code) (/ code f_ref_MHz))) ;; vary between swath
 		       (old_tx_ramp_rate_magnitude MHz_per_us (lambda (code) (* ; (** -1 (~ (& code 1)))
 									    code
 									    (/ (** f_ref_MHz 2)

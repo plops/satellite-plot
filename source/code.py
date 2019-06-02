@@ -35,7 +35,7 @@ df["sampling_window_length_hr_us"]=df["sampling_window_length"].apply(lambda cod
 df["sampling_window_length_hr_n1_rx_samples_at_adc_output"]=df["sampling_window_length"].apply(lambda code: ((8)*(code)))
 df["sampling_window_length_hr_n2_rx_complex_samples_at_ddc_output"]=df["sampling_window_length"].apply(lambda code: ((4)*(code)))
 df["old_tx_pulse_length_hr_us"]=df["old_tx_pulse_length"].apply(lambda code: ((code)/(f_ref_MHz)))
-df["pulse_repetition_intervall_hr_us"]=df["pulse_repetition_intervall"].apply(lambda code: ((code)/(f_ref_MHz)))
+df["pulse_repetition_interval_hr_us"]=df["pulse_repetition_interval"].apply(lambda code: ((code)/(f_ref_MHz)))
 df["old_tx_ramp_rate_magnitude_hr_MHz_per_us"]=df["old_tx_ramp_rate_magnitude"].apply(lambda code: ((code)*(((((f_ref_MHz)**(2)))/(((2)**(21)))))))
 df["old_tx_pulse_start_frequency_magnitude_hr_MHz"]=df["old_tx_pulse_start_frequency_magnitude"].apply(lambda code: ((code)*(((f_ref_MHz)/(((2)**(14)))))))
 # compute columns that need to access several other columns for decoding
