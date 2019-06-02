@@ -179,24 +179,34 @@
 				    :user-data-position current-user-data-position))))))))
 
 
-(defmethod csv-header ((o space-packet1) s)
-  (format s "~{~a~^,~}~%"
-	  (mapcar #'sb-mop:slot-definition-name
-		  (sb-mop:class-direct-slots (class-of o)))))
+(defmethod csv-header ((o space-packet1) s &key extra)
+  (if extra
+   (format s "~a~{~a~^,~}~%"
+	   extra (mapcar #'sb-mop:slot-definition-name
+		   (sb-mop:class-direct-slots (class-of o))))
+   (format s "~{~a~^,~}~%"
+	   (mapcar #'sb-mop:slot-definition-name
+		   (sb-mop:class-direct-slots (class-of o))))))
 
-(defmethod csv-line ((o space-packet1) s)
+(defmethod csv-line ((o space-packet1) s &key extra)
   (let* ((slots (mapcar #'sb-mop:slot-definition-name
 			(sb-mop:class-direct-slots (class-of o))))
 	 (vals (mapcar #'(lambda (x) (slot-value o x))
 		       slots)))
-    (format s "~{~a~^,~}~%"
-	    vals)))
+    (if extra
+	(format s "~a~{~a~^,~}~%"
+		extra vals)
+	(format s "~{~a~^,~}~%"
+	     vals))))
 
 (with-open-file (s "/dev/shm/headers.csv" :direction :output
 		   :if-exists :supersede)
-  (csv-header (slot-value (elt *headers* 0) 'header) s)
-  (loop for e in *headers* do
-       (csv-line (slot-value e 'header) s)))
+  (let ((l `(filename header-position user-data-position)))
+    (csv-header (slot-value (elt *headers* 0) 'header) s
+		:extra (format nil "~{~a,~}" l))
+    (loop for e in *headers* do
+	 (csv-line (slot-value e 'header) s
+		   :extra (format nil "~{~a,~}" (mapcar #'(lambda (x) (slot-value e x)) l))))))
 
 (defmethod get-user-data ((o space-packet))
   (with-slots (filename user-data-position) o
