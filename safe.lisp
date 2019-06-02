@@ -436,10 +436,14 @@ and returns one decoded symbol."
 		     (prog1
 			 (loop for block from 0 while (< decoded-symbols n) do
 			      (let* ((current-brc (if (= 0 stage)
-						      (setf (aref brcs block)
-							    (get-brc))
-						      (aref brcs block)))
-				     (dec (elt *decoder* current-brc)))
+								(setf (aref brcs block)
+								      (get-brc))
+								(aref brcs block)))
+				     (dec ((lambda ()
+					     (unless (member current-brc '(0 1 2 3 4))
+					       (break "error wrong bit-rate-code: block=~a current-brc=~a~%" block current-brc))
+					     ;(format t "block=~a current-brc=~a~%" block current-brc)
+					     (elt *decoder* current-brc)))))
 				(when (= 2 stage)
 				  (setf (aref thidxs block) (get-thidx)))
 				(prog1
