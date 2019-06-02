@@ -53,7 +53,11 @@
 	 ;; find index where elev beam address changes
 	 ;;df.iloc[np.diff(df[df['SAB-SSB-ELEVATION-BEAM-ADDRESS']==6].index)!=1][0]
 
-	 
+
+	 ;; how to plot steering direction
+	 ;>>> (df.sab_ssb_azimuth_beam_address/100).plot()
+	 ;>>> df.sab_ssb_elevation_beam_address.plot()
+
 	 
 	 (setf w (aref (dot (aref df.iloc
 				  (!= 1 (np.diff
@@ -219,6 +223,11 @@
 			      "# no pre")
 			(setf (aref df (string ,hr-name))
 			      (dot df (apply ,fun  :axis 1)))))))))
+
+	 (setf df3 (aref df (&
+			     (== df.sab_ssb_elevation_beam_address 7)
+			     (== df.sab_ssb_azimuth_beam_address 240))))
+	 
 	 (do0
 	  (imports ((pg pyqtgraph)
 		    ))

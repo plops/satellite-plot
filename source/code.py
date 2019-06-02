@@ -65,6 +65,7 @@ sampling_window_length_d_lut=np.array([[1, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 df["sampling_window_length_d_hr_samples"]=df.apply(lambda row: sampling_window_length_d_lut[row["sampling_window_length_c_hr_samples"],row["range_decimation"]], axis=1)
 # no pre
 df["sampling_window_length_hr_n3_rx_complex_samples_after_decimation"]=df.apply(lambda row: ((2)*(((1)+(row["sampling_window_length_d_hr_samples"])+(((row["range_decimation_ratio_hr_l"])*(((row["sampling_window_length_b_hr_samples"])//(row["range_decimation_ratio_hr_m"])))))))), axis=1)
+df3=df[((((df.sab_ssb_elevation_beam_address)==(7))) & (((df.sab_ssb_azimuth_beam_address)==(240))))]
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 app=QtGui.QApplication([])
