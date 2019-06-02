@@ -123,12 +123,27 @@
 							      (* (** -1 (- 1
 									   (aref row (string "old_tx_pulse_start_frequency_polarity"))))
 								 (aref row (string "old_tx_pulse_start_frequency_magnitude_hr_MHz"))))))
+		       
 		       ;; FIXME: speedup is possible. i think these values are constant in a swath
 		       ;; 3.2.5.4
 		       (range_decimation_ratio l (lambda (row) (aref (np.array (list 3 2 0 5 4 3 1 1 3  5  3  4))
 								     (aref row (string "range_decimation")))))
 		       (range_decimation_ratio m (lambda (row) (aref (np.array (list 4 3 0 9 9 8 3 6 7 16 26 11))
 								     (aref row (string "range_decimation")))))
+		       (range_decimation_freq MHz (lambda (row) (* 4 f_ref (/ (aref row (string "range_decimation_ratio_hr_l"))
+									      (aref row (string "range_decimation_ratio_hr_m"))))))
+		       ;; 3.2.5.8
+		       (old_tx_pulse_length n1_tx_samples_at_adc
+					    (lambda (row)
+					      (* 8 (aref row (string "old_tx_pulse_length")))))
+		       (old_tx_pulse_length n2_tx_complex_samples_at_ddc_output
+					    (lambda (row)
+					      (* 4 (aref row (string "old_tx_pulse_length")))))
+		       (old_tx_pulse_length n3_tx_complex_samples_after_decimation
+					    (lambda (row)
+					      (np.ceil (* (aref row (string "range_decimation_freq_hr_MHz"))
+							  (aref row (string "old_tx_pulse_length"))))))
+
 		       ;; table 5.1-2 filter output offset
 		       (filter_output_offset samples (lambda (row) (aref (np.array (list 87 87 0 88 90 92 93 103 89 97 110 91 0 0 0 0 0))
 									 (aref row (string "range_decimation")))))
@@ -137,10 +152,12 @@
 		       (sampling_window_length_b samples (lambda (row) (- (* 2 (aref row (string "sampling_window_length")))
 									  (aref row (string "filter_output_offset_hr_samples"))
 									  17)))
-		       (sampling_window_length_c samples (lambda (row) (- (aref row (string "sampling_window_length_b_hr_samples"))
-				1					  (* (aref row (string "range_decimation_ratio_hr_m"))
-									     (// (aref row (string "sampling_window_length_b_hr_samples"))
-										 (aref row (string "range_decimation_ratio_hr_m")))))))
+		       (sampling_window_length_c
+			samples
+			(lambda (row) (- (aref row (string "sampling_window_length_b_hr_samples"))
+					 (* (aref row (string "range_decimation_ratio_hr_m"))
+					    (// (aref row (string "sampling_window_length_b_hr_samples"))
+						(aref row (string "range_decimation_ratio_hr_m")))))))
 		       ;; table 5.1-1 tables of value d as function of c and range decimation
 		       (sampling_window_length_d samples
 					       ;; rgdec .. range_decimation = filter_number [ 9,  0,  8, 11]
