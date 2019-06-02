@@ -441,8 +441,12 @@ and returns one decoded symbol."
 								(aref brcs block)))
 				     (dec ((lambda ()
 					     (unless (member current-brc '(0 1 2 3 4))
-					       (break "error wrong bit-rate-code: block=~a current-brc=~a~%" block current-brc))
-					     ;(format t "block=~a current-brc=~a~%" block current-brc)
+					       (macrolet ((msg (&rest rest)
+							    `(concatenate 'string
+									  ,@(loop for e in rest collect
+										 `(format nil "~a=~a " ',e ,e)))))
+						 (break (msg block current-brc decoded-symbols number-of-baq-blocks))))
+					;(format t "block=~a current-brc=~a~%" block current-brc)
 					     (elt *decoder* current-brc)))))
 				(when (= 2 stage)
 				  (setf (aref thidxs block) (get-thidx)))
