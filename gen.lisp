@@ -232,7 +232,7 @@
 	  (imports ((pg pyqtgraph)
 		    ))
 	  "from pyqtgraph.Qt import QtCore, QtGui"
-
+ 
 	  (setf app (QtGui.QApplication (list))
 		widget (pg.TableWidget :sortable False))
 	  (widget.show)
