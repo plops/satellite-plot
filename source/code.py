@@ -54,7 +54,7 @@ df["old_tx_pulse_length_hr_n1_tx_samples_at_adc"]=df.apply(lambda row: ((8)*(row
 # no pre
 df["old_tx_pulse_length_hr_n2_tx_complex_samples_at_ddc_output"]=df.apply(lambda row: ((4)*(row["old_tx_pulse_length"])), axis=1)
 # no pre
-df["old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation"]=df.apply(lambda row: np.ceil(((row["range_decimation_freq_hr_MHz"])*(row["old_tx_pulse_length"]))), axis=1)
+df["old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation"]=df.apply(lambda row: np.ceil(((row["range_decimation_freq_hr_MHz"])*(row["old_tx_pulse_length_hr_us"]))), axis=1)
 # no pre
 df["filter_output_offset_hr_samples"]=df.apply(lambda row: np.array([87, 87, 0, 88, 90, 92, 93, 103, 89, 97, 110, 91, 0, 0, 0, 0, 0])[row["range_decimation"]], axis=1)
 # no pre

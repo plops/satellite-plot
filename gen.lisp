@@ -146,7 +146,7 @@
 		       (old_tx_pulse_length n3_tx_complex_samples_after_decimation
 					    (lambda (row)
 					      (np.ceil (* (aref row (string "range_decimation_freq_hr_MHz"))
-							  (aref row (string "old_tx_pulse_length"))))))
+							  (aref row (string "old_tx_pulse_length_hr_us"))))))
 
 		       ;; table 5.1-2 filter output offset
 		       (filter_output_offset samples (lambda (row) (aref (np.array (list 87 87 0 88 90 92 93 103 89 97 110 91 0 0 0 0 0))
