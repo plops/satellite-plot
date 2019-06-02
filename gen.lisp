@@ -130,7 +130,7 @@
 								     (aref row (string "range_decimation")))))
 		       (range_decimation_ratio m (lambda (row) (aref (np.array (list 4 3 0 9 9 8 3 6 7 16 26 11))
 								     (aref row (string "range_decimation")))))
-		       (range_decimation_freq MHz (lambda (row) (* 4 f_ref (/ (aref row (string "range_decimation_ratio_hr_l"))
+		       (range_decimation_freq MHz (lambda (row) (* 4 f_ref_MHz (/ (aref row (string "range_decimation_ratio_hr_l"))
 									      (aref row (string "range_decimation_ratio_hr_m"))))))
 		       ;; 3.2.5.8
 		       (old_tx_pulse_length n1_tx_samples_at_adc
@@ -163,6 +163,12 @@
 					       ;; rgdec .. range_decimation = filter_number [ 9,  0,  8, 11]
 					       ;; l m
 					       ;; filter_output_offset
+					       (lambda (row)
+						  (aref 
+						   sampling_window_length_d_lut
+						   (aref row (string "sampling_window_length_c_hr_samples"))
+						   (aref row (string "range_decimation"))))
+					       :pre
 					       ,(let ((tbl `((1 1 2 3) ;; range_decimation = 0, c = 0,1,2,3
 							     (1 1 2) ;; range_decimation = 1, c = 0,1,2
 							     ()
@@ -180,21 +186,17 @@
 							     ()
 							     ()
 							     ())))
-						  `(lambda (row)
-						     (aref 
-						      (np.array
-						       (list ,@(loop for col in tbl and range_decimation from 0 upto 16 collect
-								    `(list ,@(loop for d in
-										  (subseq
-										   (concatenate 'list
-												col
-												(loop for i below 26 collect 0))
-										   0 26)
-										and c from 0 upto 25  collect
-									d)))))
-						      
-						      (aref row (string "sampling_window_length_c_hr_samples"))
-						      (aref row (string "range_decimation"))))))
+						  `(setf sampling_window_length_d_lut
+						     (np.array
+						      (list ,@(loop for col in tbl and range_decimation from 0 upto 16 collect
+								   `(list ,@(loop for d in
+										 (subseq
+										  (concatenate 'list
+											       col
+											       (loop for i below 26 collect 0))
+										  0 26)
+									       and c from 0 upto 25  collect
+									       d))))))))
 		       (sampling_window_length n3_rx_complex_samples_after_decimation
 					       ;; rgdec .. range_decimation = filter_number [ 9,  0,  8, 11]
 					       ;; l m
@@ -209,9 +211,12 @@
 								(aref row (string "range_decimation_ratio_hr_m"))))))))
 		       )))
 	      (loop for e in l collect
-		   (destructuring-bind (name unit fun) e
+		   (destructuring-bind (name unit fun &key pre) e
 		     (let ((hr-name (format nil "~a_hr_~a" name unit)))
-		      `(do0
+		       `(do0
+			 ,(if pre
+			      pre
+			      "# no pre")
 			(setf (aref df (string ,hr-name))
 			      (dot df (apply ,fun  :axis 1)))))))))
 	 (do0
