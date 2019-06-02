@@ -679,18 +679,19 @@ and returns one decoded symbol."
 								    :direction :output
 								    :if-exists :supersede
 								    :if-does-not-exist :create)
-						   (format s-log "~a,~a~%" 'packet_number 'file_position)
+						   (format s-log "~a,~a,~a~%" 'packet_number 'file_position 'decompressed_length)
 						   (loop for e in chunk and i from 0 do
 						       (when (= 0 (mod i 100))
 							 (format t "~10d ~8,4f%~%" p (* (/ 100.0 (length chunk)) i )))
 						       (let ((z (decompress e)))
-							 (format s-log "~a,~a~%" i (file-position (elt out p)))
-							 (format t "~a,~a~%" i (file-position (elt out p)))
+							 (format s-log "~a,~a,~a~%" i (file-position (elt out p)) (length z))
+							 (format t "~a,~a,~a~%" i (file-position (elt out p)) (length z))
 							 (force-output s-log)
 							 (sb-sys:with-pinned-objects (z)
 							   (let ((start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
-							     (sb-posix:write (sb-ext::fd-stream-fd (elt out p)) start-sap (* (/ (* 2 32) 8)
-															     (length z)))))
+							     (sb-posix:write (sb-ext::fd-stream-fd (elt out p)) start-sap
+									     (* (/ (* 2 32) 8)
+										(length z)))))
 							 #+nil (write-sequence z (elt out i))))))
 					     :name (format nil "sat-parse-~a" p)
 					     :arguments p))))
