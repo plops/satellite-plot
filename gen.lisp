@@ -246,11 +246,13 @@
 		       (old_tx_pulse_start_frequency_hr_MHz)
 		       (old_tx_pulse_length_hr_us)
 		       (old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation)
-		       (number_of_quads "number of iq data samples")
+		       (number_of_quads "number of iq data sample pairs")
 		       (pulse_repetition_interval_hr_us))))
 	      (loop for e in l collect
 		   (destructuring-bind (name &optional comment) e
-		     `(print (dot (string ,(format nil "~a={} (~a)" name comment))
+		     `(print (dot (string ,(if comment
+					       (format nil "~a={} (~a)" name comment)
+					       (format nil "~a={}" name)))
 				  (format (aref cal (string ,name))))))))
 	  (setf a (dot (np.fromfile (string "/home/martin/sat-data/chunk0")
 				    :dtype np.complex64

@@ -659,6 +659,7 @@ and returns one decoded symbol."
 ;; (floor 383.2 60)
 
 
+
 (time
  (let* ((nproc 1)
 	(lines-per-proc (ceiling (length *headers*) nproc))
@@ -674,15 +675,23 @@ and returns one decoded symbol."
 			:if-exists :supersede)))
 	(threads (loop for chunk in chunks and p from 0 collect
 		      (sb-thread:make-thread #'(lambda (p)
-						 (loop for e in chunk and i from 0 do
-						      (when (= 0 (mod i 100))
-							(format t "~a ~a%~%" p (* (/ 100.0 (length chunk)) i )))
-						      (let ((z (decompress e)))
-							(sb-sys:with-pinned-objects (z)
-							  (let ((start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
-							    (sb-posix:write (sb-ext::fd-stream-fd (elt out p)) start-sap (* (/ (* 2 32) 8)
-														      (length z)))))
-							#+nil (write-sequence z (elt out i)))))
+						 (with-open-file (s-log (format nil "/dev/shm/chunk~a.csv" p)
+								    :direction :output
+								    :if-exists :supersede
+								    :if-does-not-exist :create)
+						   (format s-log "~a,~a~%" 'packet_number 'file_position)
+						   (loop for e in chunk and i from 0 do
+						       (when (= 0 (mod i 100))
+							 (format t "~10d ~8,4f%~%" p (* (/ 100.0 (length chunk)) i )))
+						       (let ((z (decompress e)))
+							 (format s-log "~a,~a~%" i (file-position (elt out p)))
+							 (format t "~a,~a~%" i (file-position (elt out p)))
+							 (force-output s-log)
+							 (sb-sys:with-pinned-objects (z)
+							   (let ((start-sap (sb-sys:vector-sap (sb-ext:array-storage-vector z))))
+							     (sb-posix:write (sb-ext::fd-stream-fd (elt out p)) start-sap (* (/ (* 2 32) 8)
+															     (length z)))))
+							 #+nil (write-sequence z (elt out i))))))
 					     :name (format nil "sat-parse-~a" p)
 					     :arguments p))))
    (loop for th in threads do
