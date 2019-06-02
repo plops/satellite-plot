@@ -227,6 +227,22 @@
 	 (setf df3 (aref df (&
 			     (== df.sab_ssb_elevation_beam_address 7)
 			     (== df.sab_ssb_azimuth_beam_address 240))))
+
+	 (do0
+	  "# read first packet with calibration data"
+	  (setf cal
+		(dot
+		 (aref df (== df.sab_ssb_calibration_p 1))
+		 (aref iloc 0)))
+	  ,(let ((l `(user_data_position "first byte in the file with echo data"))))
+	  (setf a (dot (np.fromfile (string "/home/martin/sat-data/chunk0")
+				    :dtype np.complex64
+				    :count (* w n))
+		       (reshape (tuple w n)))
+		win (np.hamming n)
+					; k (np.fft.fft2 (* win a) :axes (list 0))
+					;(aref k (slice 0 20) ":") 0
+		))
 	 
 	 (do0
 	  (imports ((pg pyqtgraph)

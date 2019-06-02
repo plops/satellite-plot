@@ -66,6 +66,10 @@ df["sampling_window_length_d_hr_samples"]=df.apply(lambda row: sampling_window_l
 # no pre
 df["sampling_window_length_hr_n3_rx_complex_samples_after_decimation"]=df.apply(lambda row: ((2)*(((1)+(row["sampling_window_length_d_hr_samples"])+(((row["range_decimation_ratio_hr_l"])*(((row["sampling_window_length_b_hr_samples"])//(row["range_decimation_ratio_hr_m"])))))))), axis=1)
 df3=df[((((df.sab_ssb_elevation_beam_address)==(7))) & (((df.sab_ssb_azimuth_beam_address)==(240))))]
+# read first packet with calibration data
+cal=df[((df.sab_ssb_calibration_p)==(1))].iloc[0]
+a=np.fromfile("/home/martin/sat-data/chunk0", dtype=np.complex64, count=((w)*(n))).reshape((w,n,))
+win=np.hamming(n)
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 app=QtGui.QApplication([])

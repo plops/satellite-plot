@@ -391,7 +391,7 @@ and returns one decoded symbol."
   (aref +sf+ thidx))
 
 (defmethod decompress ((pkg space-packet) &key (verbose nil))
-  (let* ((pkg (elt *headers* 0))
+  (let* (;(pkg (elt *headers* 0))
 	 (current-bit 0)
 	 (brcs ())
 	 (thidxs ()))
