@@ -68,6 +68,19 @@ df["sampling_window_length_hr_n3_rx_complex_samples_after_decimation"]=df.apply(
 df3=df[((((df.sab_ssb_elevation_beam_address)==(7))) & (((df.sab_ssb_azimuth_beam_address)==(240))))]
 # read first packet with calibration data
 cal=df[((df.sab_ssb_calibration_p)==(1))].iloc[0]
+print("user_data_position={} (first byte in the file with compressed echo data)".format(cal["user_data_position"]))
+print("data_length={} (number of octets storing the compressed echo)".format(cal["data_length"]))
+print("sampling_window_start_time_hr_us={} (nil)".format(cal["sampling_window_start_time_hr_us"]))
+print("rank={} (nil)".format(cal["rank"]))
+print("sampling_window_length_hr_us={} (nil)".format(cal["sampling_window_length_hr_us"]))
+print("sampling_window_length_hr_n3_rx_complex_samples_after_decimation={} (nil)".format(cal["sampling_window_length_hr_n3_rx_complex_samples_after_decimation"]))
+print("range_decimation_freq_hr_MHz={} (nil)".format(cal["range_decimation_freq_hr_MHz"]))
+print("old_tx_ramp_rate_hr_MHz_per_us={} (nil)".format(cal["old_tx_ramp_rate_hr_MHz_per_us"]))
+print("old_tx_pulse_start_frequency_hr_MHz={} (nil)".format(cal["old_tx_pulse_start_frequency_hr_MHz"]))
+print("old_tx_pulse_length_hr_us={} (nil)".format(cal["old_tx_pulse_length_hr_us"]))
+print("old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation={} (nil)".format(cal["old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation"]))
+print("number_of_quads={} (number of iq data samples)".format(cal["number_of_quads"]))
+print("pulse_repetition_interval_hr_us={} (nil)".format(cal["pulse_repetition_interval_hr_us"]))
 a=np.fromfile("/home/martin/sat-data/chunk0", dtype=np.complex64, count=((w)*(n))).reshape((w,n,))
 win=np.hamming(n)
 import pyqtgraph as pg

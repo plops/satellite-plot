@@ -234,7 +234,24 @@
 		(dot
 		 (aref df (== df.sab_ssb_calibration_p 1))
 		 (aref iloc 0)))
-	  ,(let ((l `(user_data_position "first byte in the file with echo data"))))
+	  ,@(let ((l `((user_data_position "first byte in the file with compressed echo data")
+		      (data_length "number of octets storing the compressed echo")
+		       (sampling_window_start_time_hr_us)
+		       
+		       (rank)
+		       (sampling_window_length_hr_us)
+		       (sampling_window_length_hr_n3_rx_complex_samples_after_decimation)
+		       (range_decimation_freq_hr_MHz)
+		       (old_tx_ramp_rate_hr_MHz_per_us)
+		       (old_tx_pulse_start_frequency_hr_MHz)
+		       (old_tx_pulse_length_hr_us)
+		       (old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation)
+		       (number_of_quads "number of iq data samples")
+		       (pulse_repetition_interval_hr_us))))
+	      (loop for e in l collect
+		   (destructuring-bind (name &optional comment) e
+		     `(print (dot (string ,(format nil "~a={} (~a)" name comment))
+				  (format (aref cal (string ,name))))))))
 	  (setf a (dot (np.fromfile (string "/home/martin/sat-data/chunk0")
 				    :dtype np.complex64
 				    :count (* w n))
