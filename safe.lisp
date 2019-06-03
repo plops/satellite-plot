@@ -12,6 +12,7 @@
 
 (in-package :g)
 
+;; /home/martin/Downloads/S1A_IW_RAW__0SSH_20180819T144551_20180819T144623_023316_02892E_DDA9.SAFE/s1a-iw-raw-s-hh-20180819t144551-20180819t144623-023316-02892e.dat
 ;; S1A_IW_RAW__0SSH_20180819T144551_20180819T144623_023316_02892E_DDA9.zip
 ;; https://scihub.copernicus.eu/apihub/odata/v1/Products('87b645f0-852a-4b27-ae05-829b09622da5')/$value
 (defparameter *fn* (elt (directory "/home/martin/Downloads/S*/*-??????.dat") 0))
