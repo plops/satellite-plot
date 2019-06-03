@@ -287,6 +287,13 @@ respectively);
   - why does the c code have so many errors?
   - cpxfiddle.cc:1857:21: error: ISO C++ forbids comparison between pointer and integer   if (argv[optind]=='\0')
   - python 2.7, i think it doesn't focus
+  - https://github.com/maheshkha/SAR_IMAGE_GPU/blob/master/SAR_image/SAR_image/SAR_cuda.cu
+  - https://github.com/ngageoint/MATLAB_SAR
+  
+# SAR theory
+
+- a synthetic antenna observes the target in its near field
+
 
 # Sentinel 3 Altimeter
 - http://www.altimetry.info/filestorage/Radar_Altimetry_Tutorial.pdf
@@ -323,3 +330,4 @@ s1b-iw1-slc-vh-20180911t054945-20180911t055010-012663-0175e1-001.xml
             <frequency>9.939724922180176e+00</frequency>
           </fineDce>
 ```
+
