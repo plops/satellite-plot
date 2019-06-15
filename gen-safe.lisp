@@ -55,8 +55,14 @@ is replaced with replacement."
 		    (with-compilation-unit
 			(raw "//! \\file main.c "))
 		  
-		  (include <iostream>)
-		  (include <array>)
+		  ;(include <iostream>)
+					;(include <array>)
+
+		  (include <stdio.h>)
+		  (include <string.h>)
+		  (include <sys/mman.h>)
+		  (include <unistd.h>)
+		  
 		  (raw " ")
 		  
 		  (raw " ")
@@ -72,11 +78,21 @@ is replaced with replacement."
 		  (raw " ")
 		  (raw " ")
 		  (raw "//! \\section References ")
+		  
+		  
 		  ,@(loop for i from 1 and e in
 			 '(""
 			   )
 		       collect
 			 `(raw ,(format nil "//! ~a. ~a" i e)))
+		  (raw " ")
+
+
+		  (function (get_file_size ((filename :type "const char*"))
+					   size_t)
+			    (let ((st :type "struct stat"))
+			      (funcall stat filename &st)
+			      (return st.st_size)))
 		  
 		  
 		  ,@(dox :brief "main function"
@@ -87,10 +103,13 @@ is replaced with replacement."
 		  		  
 		  (function (main ((argc :type int)
 				   (argv :type char**)) int)
-
+			    (let ((fn :type "const char*" :init (string "/home/martin/Downloads/S1A_IW_RAW__0SDV_20190601T055817_20190601T055849_027482_0319D1_537D.SAFE/s1a-iw-raw-s-vv-20190601t055817-20190601t055849-027482-0319d1.dat"))
+				  (filesize :type size_t :init (funcall get_file_size fn))
+				  (fd :type int :init (funcall open fn O_RDONLY 0))
+				  ))
 			    
 			    (return 0)))))
-    (write-source "stage/cl-gen-halide-test/source/main_safe" "c" code)))
+    (write-source "stage/satellite-plot/source/main_safe" "c" code)))
 
 
                                 

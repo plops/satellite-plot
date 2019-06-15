@@ -1,6 +1,8 @@
 //! \file main.c
-#include <array>
-#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 //! \mainpage safe parser
 //! \section Introduction
@@ -15,6 +17,14 @@
 //! \section References
 //! 1.
 
+size_t get_file_size(const char *filename) {
+  {
+    struct stat st;
+    stat(filename, &st);
+    return st.st_size;
+  }
+}
+
 //! @brief main function
 //!
 //! @usage main program
@@ -24,4 +34,15 @@
 //!
 //! @return Integer
 
-int main(int argc, char **argv) { return 0; }
+int main(int argc, char **argv) {
+  {
+    const char *fn =
+        "/home/martin/Downloads/"
+        "S1A_IW_RAW__0SDV_20190601T055817_20190601T055849_027482_0319D1_537D."
+        "SAFE/"
+        "s1a-iw-raw-s-vv-20190601t055817-20190601t055849-027482-0319d1.dat";
+    size_t filesize = get_file_size(fn);
+    int fd = open(fn, O_RDONLY, 0);
+  }
+  return 0;
+}

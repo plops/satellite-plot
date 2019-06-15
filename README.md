@@ -1,10 +1,10 @@
 # contents
 
-| file      | generated | comment                                                                              | depends on |
-|-----------|-----------|--------------------------------------------------------------------------------------|------------|
-| safe.lisp |           | parse radar level 0 dataset, store package headers as csv, decode compressed data    | -          |
-| gen.lisp  | code.py   | show table with qt, decode sub-commutated data from csv, decode tx pulse information | safe.lisp  |
-|           |           |                                                                                      |            |
+| file              | generated | comment                                                                              | depends on |
+|-------------------|-----------|--------------------------------------------------------------------------------------|------------|
+| safe.lisp         |           | parse radar level 0 dataset, store package headers as csv, decode compressed data    | -          |
+| gen.lisp          | code.py   | show table with qt, decode sub-commutated data from csv, decode tx pulse information | safe.lisp  |
+| gen-cpp-safe.lisp | safe.cpp  | same as safe.lisp but in c++                                                         |            |
 
 
 # spectral reflectance data
