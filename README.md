@@ -1,3 +1,11 @@
+# contents
+
+| file      | generated | comment                                                                              | depends on |
+|-----------|-----------|--------------------------------------------------------------------------------------|------------|
+| safe.lisp |           | parse radar level 0 dataset, store package headers as csv, decode compressed data    | -          |
+| gen.lisp  | code.py   | show table with qt, decode sub-commutated data from csv, decode tx pulse information | safe.lisp  |
+|           |           |                                                                                      |            |
+
 
 # spectral reflectance data
 
@@ -331,3 +339,4 @@ s1b-iw1-slc-vh-20180911t054945-20180911t055010-012663-0175e1-001.xml
           </fineDce>
 ```
 
+- another place to download sentinel 1 data: https://code-de.org/en/about

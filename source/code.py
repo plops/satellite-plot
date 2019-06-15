@@ -81,8 +81,8 @@ print("old_tx_pulse_length_hr_us={}".format(cal["old_tx_pulse_length_hr_us"]))
 print("old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation={}".format(cal["old_tx_pulse_length_hr_n3_tx_complex_samples_after_decimation"]))
 print("number_of_quads={} (number of iq data sample pairs)".format(cal["number_of_quads"]))
 print("pulse_repetition_interval_hr_us={}".format(cal["pulse_repetition_interval_hr_us"]))
-n=19380
-w=129
+n=24072
+w=332
 a=np.fromfile("/home/martin/sat-data/chunk0", dtype=np.complex64, count=((w)*(n))).reshape((w,n,))
 win=np.hamming(n)
 import pyqtgraph as pg

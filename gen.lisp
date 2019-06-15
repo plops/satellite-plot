@@ -254,8 +254,8 @@
 					       (format nil "~a={} (~a)" name comment)
 					       (format nil "~a={}" name)))
 				  (format (aref cal (string ,name))))))))
-	  (setf n 19380
-		w 129)
+	  (setf n 24072
+		w 332)
 	  (setf a (dot (np.fromfile (string "/home/martin/sat-data/chunk0")
 				    :dtype np.complex64
 				    :count (* w n))
