@@ -46,6 +46,7 @@ is replaced with replacement."
   `((10 "")))
 
 
+
 (defmacro with-open-fstream ((f fn &key (dir "/dev/shm")) &body body)
   `(let ((,f :type "std::ofstream" :ctor (comma-list (string ,(format nil "~a/~a" dir fn)))))
      ,@body))
@@ -58,10 +59,17 @@ is replaced with replacement."
 		  ;(include <iostream>)
 					;(include <array>)
 
-		  (include <stdio.h>)
-		  (include <string.h>)
-		  (include <sys/mman.h>)
-		  (include <unistd.h>)
+		  ,@(loop for e in `(<stdio.h>
+				     <string.h>
+				     <sys/mman.h>
+				     <unistd.h>
+				     <assert.h>
+				     <sys/stat.h>
+				     <fcntl.h>
+				     <sys/types.h>) collect
+			 `(include ,e))
+		  
+		  
 		  
 		  (raw " ")
 		  
@@ -106,7 +114,19 @@ is replaced with replacement."
 			    (let ((fn :type "const char*" :init (string "/home/martin/Downloads/S1A_IW_RAW__0SDV_20190601T055817_20190601T055849_027482_0319D1_537D.SAFE/s1a-iw-raw-s-vv-20190601t055817-20190601t055849-027482-0319d1.dat"))
 				  (filesize :type size_t :init (funcall get_file_size fn))
 				  (fd :type int :init (funcall open fn O_RDONLY 0))
-				  ))
+				  )
+			      (funcall assert (!= fd -1))
+			      (let ((mmapped_data
+				     :type void*
+				     :init
+				     (funcall mmap NULL filesize PROT_READ
+					      (|\|| MAP_PRIVATE MAP_POPULATE)
+					      fd
+					      0)))
+				(funcall assert (!= mmapped_data MAP_FAILED))
+				(let ((rc :type int :init (funcall munmap mmapped_data filesize)))
+				  (funcall assert (== rc 0))))
+			      (funcall close fd))
 			    
 			    (return 0)))))
     (write-source "stage/satellite-plot/source/main_safe" "c" code)))

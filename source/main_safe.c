@@ -1,7 +1,11 @@
 //! \file main.c
+#include <assert.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 //! \mainpage safe parser
@@ -43,6 +47,17 @@ int main(int argc, char **argv) {
         "s1a-iw-raw-s-vv-20190601t055817-20190601t055849-027482-0319d1.dat";
     size_t filesize = get_file_size(fn);
     int fd = open(fn, O_RDONLY, 0);
+    assert((fd != -1));
+    {
+      void *mmapped_data =
+          mmap(NULL, filesize, PROT_READ, (MAP_PRIVATE | MAP_POPULATE), fd, 0);
+      assert((mmapped_data != MAP_FAILED));
+      {
+        int rc = munmap(mmapped_data, filesize);
+        assert((rc == 0));
+      }
+    }
+    close(fd);
   }
   return 0;
 }
