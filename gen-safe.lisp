@@ -120,7 +120,9 @@ is replaced with replacement."
 				     :type void*
 				     :init
 				     (funcall mmap NULL filesize PROT_READ
-					      (|\|| MAP_PRIVATE MAP_POPULATE)
+					      (|\|| MAP_PRIVATE
+						    MAP_POPULATE ;; let kernel preload parts
+						    )
 					      fd
 					      0)))
 				(funcall assert (!= mmapped_data MAP_FAILED))
