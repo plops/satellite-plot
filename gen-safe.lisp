@@ -144,6 +144,9 @@ is replaced with replacement."
 (floor 169 8)
 (floor 96 8)
 
+(ldb (byte 3 (- 8 (+ 3 1))) #xff)
+
+
 (defun space-packet-slot-get (slot-name data8)
   (let* ((slot-idx (position slot-name *space-packet* :key #'first))
 	 (preceding-slots (subseq *space-packet* 0 slot-idx))
@@ -158,7 +161,8 @@ is replaced with replacement."
 	
 	(format t "~a ~a ~a ~a" preceding-octets preceding-bits bits default-value)
 	(let ((mask 0))
-	  (setf (ldb (byte bits (- 8 preceding-bits)) mask) #xff)
+	  (declare (type (unsigned-byte 8) mask))
+	  (setf (ldb (byte bits (- 8 (+ bits preceding-bits))) mask) #xff)
 	 `(>> (&
 	       (hex ,mask)
 	       (aref ,data8 (+ 1 ,preceding-octets)))
