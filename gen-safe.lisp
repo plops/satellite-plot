@@ -146,6 +146,17 @@ is replaced with replacement."
 
 (ldb (byte 3 (- 8 (+ 3 1))) #xff)
 
+(floor 19 8)
+
+(* 8 (ceiling 19 8))
+
+(defun next-power-of-two (n)
+  (let ((i 1))
+    (loop while (< i n) do
+      (setf i (* i 2)))
+    i))
+
+(next-power-of-two 19)
 
 (defun space-packet-slot-get (slot-name data8)
   (let* ((slot-idx (position slot-name *space-packet* :key #'first))
@@ -159,16 +170,44 @@ is replaced with replacement."
     (multiple-value-bind (preceding-octets preceding-bits) (floor sum-preceding-bits 8) 
       (destructuring-bind (name_ default-value &key bits) (elt *space-packet* slot-idx)
 	
-	(format t "~a ~a ~a ~a" preceding-octets preceding-bits bits default-value)
-	(let ((mask 0))
-	  (declare (type (unsigned-byte 8) mask))
-	  (setf (ldb (byte bits (- 8 (+ bits preceding-bits))) mask) #xff)
-	 `(>> (&
-	       (hex ,mask)
-	       (aref ,data8 (+ 1 ,preceding-octets)))
-	      (- 8 (+ ,bits ,preceding-bits))))))))
+	(format t "~a ~a ~a ~a~%" preceding-octets preceding-bits bits default-value)
+	(if (<= bits 8)
+	    (let ((mask 0))
+	      
+	      (declare (type (unsigned-byte 8) mask))
+	      (setf (ldb (byte bits (- 8 (+ bits preceding-bits))) mask) #xff)
+	      (values
+	       `(>> (&
+		     (hex ,mask)
+		     (aref ,data8 (+ 1 ,preceding-octets)))
+		    (- 8 (+ ,bits ,preceding-bits)))
+	       'uint8_t
+	       ))
+	    (multiple-value-bind (bytes rest-bits) (floor bits 8)
+	      (let ((firstmask 0)
+		    (lastmask 0))
+		(setf (ldb (byte (- 8 preceding-bits) 0) firstmask) #xff
+		      (ldb (byte rest-bits (- 8 rest-bits)) lastmask) #xff)
+		(values
+		 `(+ (>> (& (hex ,lastmask) (aref data8 ,(+ preceding-octets 1 bytes)))
+			 ,(- 8 rest-bits))
+		     ,@(loop for byte from 1 below bytes collect
+			    `(* ,(expt 256 byte)
+				(aref data8 ,(+ preceding-octets 1 byte))))
+		     (* ,(expt 256 bytes) (& (hex ,firstmask) (aref data8 ,(+ preceding-octets 1))))
+			 )
+		 (format nil "uint~a_t" (next-power-of-two bits))))
+	      ))))))
+
+(* 256 #xff)
+
+
+(+ rest-bits
+   (* 256 3))
 
 (space-packet-slot-get 'test-mode 'data8)
+
+(space-packet-slot-get 'tx-pulse-start-frequency-magnitude 'data8)
 
 (progn
   (progn
