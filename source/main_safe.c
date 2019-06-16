@@ -56,10 +56,14 @@ int main(int argc, char **argv) {
         const uint16_t *const dat16 = ((const uint16_t *const)(mmapped_data));
         const uint8_t *const dat8 = ((const uint8_t *const)(mmapped_data));
         printf("sequence-flags=0x%x\n", (0xC000 & dat16[1]));
-        printf("packet-sequence-count=0x%x\n", (0x3FFF & dat16[1]));
+        printf("packet-sequence-count=%d\n", (0x3FFF & dat16[1]));
+        printf("packet-sequence-count=%d\n",
+               (((0xFC & dat8[4]) >> 2) + (256 * (0x3F & dat8[3]))));
         printf("packet-data-length-octets=%d\n", dat16[2]);
         printf("sync-marker=0x%x\n", dat16[6]);
         printf("test-mode=0x%x\n", ((0x70 & dat8[(1 + 21)]) >> (8 - (3 + 1))));
+        printf("tx-pulse-start-frequency-magnitude=%d\n",
+               (((0xFE & dat8[46]) >> 1) + (256 * (0x7F & dat8[45]))));
       }
       {
         int rc = munmap(mmapped_data, filesize);

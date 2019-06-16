@@ -189,12 +189,12 @@ is replaced with replacement."
 		(setf (ldb (byte (- 8 preceding-bits) 0) firstmask) #xff
 		      (ldb (byte rest-bits (- 8 rest-bits)) lastmask) #xff)
 		(values
-		 `(+ (>> (& (hex ,lastmask) (aref data8 ,(+ preceding-octets 1 bytes)))
+		 `(+ (>> (& (hex ,lastmask) (aref ,data8 ,(+ preceding-octets 1 bytes)))
 			 ,(- 8 rest-bits))
 		     ,@(loop for byte from 1 below bytes collect
 			    `(* ,(expt 256 byte)
-				(aref data8 ,(+ preceding-octets 1 byte))))
-		     (* ,(expt 256 bytes) (& (hex ,firstmask) (aref data8 ,(+ preceding-octets 1))))
+				(aref ,data8 ,(+ preceding-octets 1 byte))))
+		     (* ,(expt 256 bytes) (& (hex ,firstmask) (aref ,data8 ,(+ preceding-octets 1))))
 			 )
 		 (format nil "uint~a_t" (next-power-of-two bits))))
 	      ))))))
@@ -343,13 +343,15 @@ is replaced with replacement."
 					     :init (cast "const uint16_t * const"
 							 mmapped_data))
 				      (dat8 :type "const uint8_t * const"
-					     :init (cast "const uint8_t * const"
-							 mmapped_data)))
+					    :init (cast "const uint8_t * const"
+							mmapped_data)))
 				  (funcall printf (string "sequence-flags=0x%x\\n") (& (hex #xc000) (aref dat16 1)))
-				  (funcall printf (string "packet-sequence-count=0x%x\\n") (& (hex #x3fff) (aref dat16 1)))
+				  (funcall printf (string "packet-sequence-count=%d\\n") (& (hex #x3fff) (aref dat16 1)))
+				  (funcall printf (string "packet-sequence-count=%d\\n") ,(space-packet-slot-get 'sequence-count 'dat8))
 				  (funcall printf (string "packet-data-length-octets=%d\\n") (aref dat16 2))
 				  (funcall printf (string "sync-marker=0x%x\\n") (aref dat16 6))
-				  (funcall printf (string "test-mode=0x%x\\n") ,(space-packet-slot-get 'test-mode 'dat8)))
+				  (funcall printf (string "test-mode=0x%x\\n") ,(space-packet-slot-get 'test-mode 'dat8))
+				  (funcall printf (string "tx-pulse-start-frequency-magnitude=%d\\n") ,(space-packet-slot-get 'tx-pulse-start-frequency-magnitude 'dat8)))
 				
 				(let ((rc :type int :init (funcall munmap mmapped_data filesize)))
 				  (funcall assert (== rc 0))))
