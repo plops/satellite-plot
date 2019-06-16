@@ -254,13 +254,18 @@ is replaced with replacement."
 		(setf (ldb (byte (- 8 preceding-bits) 0) firstmask) #xff
 		      (ldb (byte rest-bits (- 8 rest-bits)) lastmask) #xff)
 		(values
-		 `(+ (>> (& (hex ,lastmask) (aref ,data8 ,(+ preceding-octets 0 bytes)))
-			 ,(- 8 rest-bits))
-		     ,@(loop for byte from (- bytes 1) downto 1 collect
-			    `(* ,(expt 256 (- bytes byte))
-				(aref ,data8 ,(+ preceding-octets 0 byte))))
-		     (* ,(expt 256 bytes) (& (hex ,firstmask) (aref ,data8 ,(+ preceding-octets 0))))
-			 )
+		 (if (= lastmask 0)
+		     `(+ 
+		      ,@(loop for byte from (- bytes 1) downto 1 collect
+			     `(* ,(expt 256 (- bytes byte 1))
+				 (aref ,data8 ,(+ preceding-octets 0 byte))))
+		      (* ,(expt 256 (- bytes 1)) (& (hex ,firstmask) (aref ,data8 ,(+ preceding-octets 0)))))
+		     `(+ (>> (& (hex ,lastmask) (aref ,data8 ,(+ preceding-octets 0 bytes)))
+			  ,(- 8 rest-bits))
+		      ,@(loop for byte from (- bytes 1) downto 1 collect
+			     `(* ,(expt 256 (- bytes byte))
+				 (aref ,data8 ,(+ preceding-octets 0 byte))))
+		      (* ,(expt 256 bytes) (& (hex ,firstmask) (aref ,data8 ,(+ preceding-octets 0))))))
 		 (format nil "uint~a_t" (next-power-of-two bits))))
 	      ))))))
   (let* ((code `(with-compilation-unit
