@@ -162,7 +162,7 @@ is replaced with replacement."
 	 `(>> (&
 	       (hex ,mask)
 	       (aref ,data8 (+ 1 ,preceding-octets)))
-	      (- 8 (+ bits preceding-bits))))))))
+	      (- 8 (+ ,bits ,preceding-bits))))))))
 
 (space-packet-slot-get 'test-mode 'data8)
 
@@ -298,11 +298,15 @@ is replaced with replacement."
 
 				(let ((dat16 :type "const uint16_t * const"
 					     :init (cast "const uint16_t * const"
+							 mmapped_data))
+				      (dat8 :type "const uint8_t * const"
+					     :init (cast "const uint8_t * const"
 							 mmapped_data)))
 				  (funcall printf (string "sequence-flags=0x%x\\n") (& (hex #xc000) (aref dat16 1)))
 				  (funcall printf (string "packet-sequence-count=0x%x\\n") (& (hex #x3fff) (aref dat16 1)))
 				  (funcall printf (string "packet-data-length-octets=%d\\n") (aref dat16 2))
-				  (funcall printf (string "sync-marker=0x%x\\n") (aref dat16 6)))
+				  (funcall printf (string "sync-marker=0x%x\\n") (aref dat16 6))
+				  (funcall printf (string "test-mode=0x%x\\n") ,(space-packet-slot-get 'test-mode 'dat8)))
 				
 				(let ((rc :type int :init (funcall munmap mmapped_data filesize)))
 				  (funcall assert (== rc 0))))
