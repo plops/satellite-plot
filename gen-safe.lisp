@@ -137,10 +137,11 @@ is replaced with replacement."
 	 (mapcar #'(lambda (x)
 		     (destructuring-bind (name_ default-value &key bits) x
 		       bits))
-		 (subseq *space-packet* 0 (position 'test-mode *space-packet* :key #'first)))))
+		 (subseq *space-packet* 0 (position 'sync-marker ;'test-mode
+						    *space-packet* :key #'first)))))
 
 (floor 169 8)
-
+(floor 96 8)
 
 (defun space-packet-slot-get (slot-name)
   (let* ((slot-idx (position slot-name *space-packet* :key #'first))
@@ -287,7 +288,8 @@ is replaced with replacement."
 							 mmapped_data)))
 				  (funcall printf (string "sequence-flags=0x%x\\n") (& (hex #xc000) (aref dat16 1)))
 				  (funcall printf (string "packet-sequence-count=0x%x\\n") (& (hex #x3fff) (aref dat16 1)))
-				  (funcall printf (string "packet-data-length-octets=%d\\n") (aref dat16 2)))
+				  (funcall printf (string "packet-data-length-octets=%d\\n") (aref dat16 2))
+				  (funcall printf (string "sync-marker=0x%x\\n") (aref dat16 6)))
 				
 				(let ((rc :type int :init (funcall munmap mmapped_data filesize)))
 				  (funcall assert (== rc 0))))
