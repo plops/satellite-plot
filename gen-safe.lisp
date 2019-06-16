@@ -158,46 +158,7 @@ is replaced with replacement."
 
 (next-power-of-two 19)
 
-(defun space-packet-slot-get (slot-name data8)
-  (let* ((slot-idx (position slot-name *space-packet* :key #'first))
-	 (preceding-slots (subseq *space-packet* 0 slot-idx))
-	 (sum-preceding-bits (reduce #'+
-				     (mapcar #'(lambda (x)
-						 (destructuring-bind (name_ default-value &key bits) x
-						   bits))
-					     preceding-slots)))
-	 )
-    (multiple-value-bind (preceding-octets preceding-bits) (floor sum-preceding-bits 8) 
-      (destructuring-bind (name_ default-value &key bits) (elt *space-packet* slot-idx)
-	
-	(format t "~a ~a ~a ~a~%" preceding-octets preceding-bits bits default-value)
-	(if (<= bits 8)
-	    (let ((mask 0))
-	      
-	      (declare (type (unsigned-byte 8) mask))
-	      (setf (ldb (byte bits (- 8 (+ bits preceding-bits))) mask) #xff)
-	      (values
-	       `(>> (&
-		     (hex ,mask)
-		     (aref ,data8 (+ 1 ,preceding-octets)))
-		    (- 8 (+ ,bits ,preceding-bits)))
-	       'uint8_t
-	       ))
-	    (multiple-value-bind (bytes rest-bits) (floor bits 8)
-	      (let ((firstmask 0)
-		    (lastmask 0))
-		(setf (ldb (byte (- 8 preceding-bits) 0) firstmask) #xff
-		      (ldb (byte rest-bits (- 8 rest-bits)) lastmask) #xff)
-		(values
-		 `(+ (>> (& (hex ,lastmask) (aref ,data8 ,(+ preceding-octets 1 bytes)))
-			 ,(- 8 rest-bits))
-		     ,@(loop for byte from 1 below bytes collect
-			    `(* ,(expt 256 byte)
-				(aref ,data8 ,(+ preceding-octets 1 byte))))
-		     (* ,(expt 256 bytes) (& (hex ,firstmask) (aref ,data8 ,(+ preceding-octets 1))))
-			 )
-		 (format nil "uint~a_t" (next-power-of-two bits))))
-	      ))))))
+
 
 (* 256 #xff)
 
@@ -262,6 +223,46 @@ is replaced with replacement."
 
  
  )
+  (defun space-packet-slot-get (slot-name data8)
+  (let* ((slot-idx (position slot-name *space-packet* :key #'first))
+	 (preceding-slots (subseq *space-packet* 0 slot-idx))
+	 (sum-preceding-bits (reduce #'+
+				     (mapcar #'(lambda (x)
+						 (destructuring-bind (name_ default-value &key bits) x
+						   bits))
+					     preceding-slots)))
+	 )
+    (multiple-value-bind (preceding-octets preceding-bits) (floor sum-preceding-bits 8) 
+      (destructuring-bind (name_ default-value &key bits) (elt *space-packet* slot-idx)
+	
+	(format t "~a ~a ~a ~a~%" preceding-octets preceding-bits bits default-value)
+	(if (<= bits 8)
+	    (let ((mask 0))
+	      
+	      (declare (type (unsigned-byte 8) mask))
+	      (setf (ldb (byte bits (- 8 (+ bits preceding-bits))) mask) #xff)
+	      (values
+	       `(>> (&
+		     (hex ,mask)
+		     (aref ,data8 (+ 1 ,preceding-octets)))
+		    (- 8 (+ ,bits ,preceding-bits)))
+	       'uint8_t
+	       ))
+	    (multiple-value-bind (bytes rest-bits) (floor (+ preceding-bits bits) 8)
+	      (let ((firstmask 0)
+		    (lastmask 0))
+		(setf (ldb (byte (- 8 preceding-bits) 0) firstmask) #xff
+		      (ldb (byte rest-bits (- 8 rest-bits)) lastmask) #xff)
+		(values
+		 `(+ (>> (& (hex ,lastmask) (aref ,data8 ,(+ preceding-octets 0 bytes)))
+			 ,(- 8 rest-bits))
+		     ,@(loop for byte from (- bytes 1) downto 1 collect
+			    `(* ,(expt 256 (- bytes byte))
+				(aref ,data8 ,(+ preceding-octets 0 byte))))
+		     (* ,(expt 256 bytes) (& (hex ,firstmask) (aref ,data8 ,(+ preceding-octets 0))))
+			 )
+		 (format nil "uint~a_t" (next-power-of-two bits))))
+	      ))))))
   (let* ((code `(with-compilation-unit
 		    (with-compilation-unit
 			(raw "//! \\file main.c "))
@@ -350,6 +351,8 @@ is replaced with replacement."
 				  (funcall printf (string "packet-sequence-count=%d\\n") ,(space-packet-slot-get 'sequence-count 'dat8))
 				  (funcall printf (string "packet-data-length-octets=%d\\n") (aref dat16 2))
 				  (funcall printf (string "sync-marker=0x%x\\n") (aref dat16 6))
+				  (funcall printf (string "sync-marker=0x%x\\n") ,(space-packet-slot-get 'sync-marker 'dat8))
+				  
 				  (funcall printf (string "test-mode=0x%x\\n") ,(space-packet-slot-get 'test-mode 'dat8))
 				  (funcall printf (string "tx-pulse-start-frequency-magnitude=%d\\n") ,(space-packet-slot-get 'tx-pulse-start-frequency-magnitude 'dat8)))
 				

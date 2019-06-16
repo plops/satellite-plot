@@ -58,12 +58,18 @@ int main(int argc, char **argv) {
         printf("sequence-flags=0x%x\n", (0xC000 & dat16[1]));
         printf("packet-sequence-count=%d\n", (0x3FFF & dat16[1]));
         printf("packet-sequence-count=%d\n",
-               (((0xFC & dat8[4]) >> 2) + (256 * (0x3F & dat8[3]))));
+               (((0x0 & dat8[4]) >> 8) + (256 * dat8[3]) +
+                (65536 * (0x3F & dat8[2]))));
         printf("packet-data-length-octets=%d\n", dat16[2]);
         printf("sync-marker=0x%x\n", dat16[6]);
+        printf("sync-marker=0x%x\n",
+               (((0x0 & dat8[16]) >> 8) + (256 * dat8[15]) +
+                (65536 * dat8[14]) + (16777216 * dat8[13]) +
+                (4294967296 * (0xFF & dat8[12]))));
         printf("test-mode=0x%x\n", ((0x70 & dat8[(1 + 21)]) >> (8 - (3 + 1))));
         printf("tx-pulse-start-frequency-magnitude=%d\n",
-               (((0xFE & dat8[46]) >> 1) + (256 * (0x7F & dat8[45]))));
+               (((0x0 & dat8[46]) >> 8) + (256 * dat8[45]) +
+                (65536 * (0x7F & dat8[44]))));
       }
       {
         int rc = munmap(mmapped_data, filesize);
