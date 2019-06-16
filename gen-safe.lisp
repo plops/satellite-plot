@@ -137,21 +137,34 @@ is replaced with replacement."
 	 (mapcar #'(lambda (x)
 		     (destructuring-bind (name_ default-value &key bits) x
 		       bits))
-		 (subseq *space-packet* 0 (position 'sync-marker ;'test-mode
+		 (subseq *space-packet* 0 (position ;'sync-marker
+						    'test-mode
 						    *space-packet* :key #'first)))))
 
 (floor 169 8)
 (floor 96 8)
 
-(defun space-packet-slot-get (slot-name)
+(defun space-packet-slot-get (slot-name data8)
   (let* ((slot-idx (position slot-name *space-packet* :key #'first))
 	 (preceding-slots (subseq *space-packet* 0 slot-idx))
 	 (sum-preceding-bits (reduce #'+
 				     (mapcar #'(lambda (x)
 						 (destructuring-bind (name_ default-value &key bits) x
 						   bits))
-					     preceding-slots))))
-   (destructuring-bind (name_ default-value &key bits) (assoc name *space-packet*))))
+					     preceding-slots)))
+	 )
+    (multiple-value-bind (preceding-octets preceding-bits) (floor sum-preceding-bits 8) 
+      (destructuring-bind (name_ default-value &key bits) (elt *space-packet* slot-idx)
+	
+	(format t "~a ~a ~a ~a" preceding-octets preceding-bits bits default-value)
+	(let ((mask 0))
+	  (setf (ldb (byte bits (- 8 preceding-bits)) mask) #xff)
+	 `(>> (&
+	       (hex ,mask)
+	       (aref ,data8 (+ 1 ,preceding-octets)))
+	      (- 8 (+ bits preceding-bits))))))))
+
+(space-packet-slot-get 'test-mode 'data8)
 
 (progn
   (progn
