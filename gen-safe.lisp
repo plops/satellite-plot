@@ -66,6 +66,7 @@ is replaced with replacement."
 				     <assert.h>
 				     <sys/stat.h>
 				     <fcntl.h>
+				     <stdint.h>
 				     <sys/types.h>) collect
 			 `(include ,e))
 		  
@@ -120,12 +121,21 @@ is replaced with replacement."
 				     :type void*
 				     :init
 				     (funcall mmap NULL filesize PROT_READ
-					      (|\|| MAP_PRIVATE
+					      MAP_PRIVATE
+					      #+nil(|\|| MAP_PRIVATE
 						    MAP_POPULATE ;; let kernel preload parts
 						    )
 					      fd
 					      0)))
 				(funcall assert (!= mmapped_data MAP_FAILED))
+
+				(let ((dat16 :type "const uint16_t * const"
+					     :init (cast "const uint16_t * const"
+							 mmapped_data)))
+				  (funcall printf (string "sequence-flags=0x%x\\n") (& (hex #xc000) (aref dat16 1)))
+				  (funcall printf (string "packet-sequence-count=0x%x\\n") (& (hex #x3fff) (aref dat16 1)))
+				  (funcall printf (string "packet-data-length-octets=%d\\n") (aref dat16 2)))
+				
 				(let ((rc :type int :init (funcall munmap mmapped_data filesize)))
 				  (funcall assert (== rc 0))))
 			      (funcall close fd))
@@ -134,4 +144,4 @@ is replaced with replacement."
     (write-source "stage/satellite-plot/source/main_safe" "c" code)))
 
 
-                                
+  

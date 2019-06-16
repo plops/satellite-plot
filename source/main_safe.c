@@ -1,6 +1,7 @@
 //! \file main.c
 #include <assert.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -49,9 +50,14 @@ int main(int argc, char **argv) {
     int fd = open(fn, O_RDONLY, 0);
     assert((fd != -1));
     {
-      void *mmapped_data =
-          mmap(NULL, filesize, PROT_READ, (MAP_PRIVATE | MAP_POPULATE), fd, 0);
+      void *mmapped_data = mmap(NULL, filesize, PROT_READ, MAP_PRIVATE, fd, 0);
       assert((mmapped_data != MAP_FAILED));
+      {
+        const uint16_t *const dat16 = ((const uint16_t *const)(mmapped_data));
+        printf("sequence-flags=0x%x\n", (0xC000 & dat16[1]));
+        printf("packet-sequence-count=0x%x\n", (0x3FFF & dat16[1]));
+        printf("packet-data-length-octets=%d\n", dat16[2]);
+      }
       {
         int rc = munmap(mmapped_data, filesize);
         assert((rc == 0));
