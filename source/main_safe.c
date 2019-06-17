@@ -57,31 +57,28 @@ int main(int argc, char **argv) {
         const uint8_t *const data8 = ((const uint8_t *const)(mmapped_data));
         {
           uint64_t offset = 0;
-          for (int count = 0; (count < 3); count += 1) {
+          size_t count = 0;
+          while ((offset < filesize)) {
             {
               const uint8_t *const dat8 = (data8 + offset);
               printf("count=%d\n", count);
-              printf("offset=%d\n", offset);
-              printf("sequence-flags=0x%x\n", (0xC000 & dat16[1]));
-              printf("packet-sequence-count=%x\n", (0x3FFF & dat16[1]));
-              printf("packet-sequence-count=%x\n",
+              printf("  offset=%d\n", offset);
+              printf("  packet-sequence-count=%d\n",
                      ((1 * dat8[3]) + (256 * (0x3F & dat8[2]))));
-              printf("packet-data-length-octets=%x\n", dat16[2]);
-              printf("packet-data-length-octets=%x\n",
+              printf("  packet-data-length-octets=%d\n",
                      ((1 * dat8[5]) + (256 * (0xFF & dat8[4]))));
-              printf("all-length-octets=%d\n",
+              printf("  all-length-octets=%d\n",
                      (6 + 1 + ((1 * dat8[5]) + (256 * (0xFF & dat8[4])))));
               offset = (offset +
                         (6 + 1 + ((1 * dat8[5]) + (256 * (0xFF & dat8[4])))));
-              printf("sync-marker=0x%x\n", dat16[6]);
-              printf("sync-marker=0x%x\n",
-                     ((1 * dat8[15]) + (256 * dat8[14]) + (65536 * dat8[13]) +
-                      (16777216 * (0xFF & dat8[12]))));
-              printf("test-mode=0x%x\n",
+              assert((((1 * dat8[15]) + (256 * dat8[14]) + (65536 * dat8[13]) +
+                       (16777216 * (0xFF & dat8[12]))) == 0x352EF853));
+              printf("  test-mode=0x%x\n",
                      ((0x70 & dat8[(1 + 21)]) >> (8 - (3 + 1))));
-              printf("tx-pulse-start-frequency-magnitude=%d\n",
+              printf("  tx-pulse-start-frequency-magnitude=%d\n",
                      ((1 * dat8[45]) + (256 * (0x7F & dat8[44]))));
             }
+            count = (count + 1);
           }
         }
       }
