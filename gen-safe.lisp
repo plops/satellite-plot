@@ -348,18 +348,29 @@ is replaced with replacement."
 				(let ((dat16 :type "const uint16_t * const"
 					     :init (cast "const uint16_t * const"
 							 mmapped_data))
-				      (dat8 :type "const uint8_t * const"
+				      (data8 :type "const uint8_t * const"
 					    :init (cast "const uint8_t * const"
 							mmapped_data)))
-				  (funcall printf (string "sequence-flags=0x%x\\n") (& (hex #xc000) (aref dat16 1)))
-				  (funcall printf (string "packet-sequence-count=%d\\n") (& (hex #x3fff) (aref dat16 1)))
-				  (funcall printf (string "packet-sequence-count=%d\\n") ,(space-packet-slot-get 'sequence-count 'dat8))
-				  (funcall printf (string "packet-data-length-octets=%d\\n") (aref dat16 2))
-				  (funcall printf (string "sync-marker=0x%x\\n") (aref dat16 6))
-				  (funcall printf (string "sync-marker=0x%x\\n") ,(space-packet-slot-get 'sync-marker 'dat8))
-				  
-				  (funcall printf (string "test-mode=0x%x\\n") ,(space-packet-slot-get 'test-mode 'dat8))
-				  (funcall printf (string "tx-pulse-start-frequency-magnitude=%d\\n") ,(space-packet-slot-get 'tx-pulse-start-frequency-magnitude 'dat8)))
+				  (let ((offset :type "uint64_t" :init 0)
+					)
+				    (dotimes (count 3)
+				     (let ((dat8 :type "const uint8_t * const"
+						 :init (+ data8 offset)))
+				       
+				       (funcall printf (string "count=%d\\n") count)
+				       (funcall printf (string "offset=%d\\n") offset)
+				       (funcall printf (string "sequence-flags=0x%x\\n") (& (hex #xc000) (aref dat16 1)))
+				       (funcall printf (string "packet-sequence-count=%x\\n") (& (hex #x3fff) (aref dat16 1)))
+				       (funcall printf (string "packet-sequence-count=%x\\n") ,(space-packet-slot-get 'sequence-count 'dat8))
+				       (funcall printf (string "packet-data-length-octets=%x\\n") (aref dat16 2))
+				       (funcall printf (string "packet-data-length-octets=%x\\n") ,(space-packet-slot-get 'data-length 'dat8))
+				       (funcall printf (string "all-length-octets=%d\\n") (+ 6 1 ,(space-packet-slot-get 'data-length 'dat8)))
+				       (setf offset (+ offset (+ 6 1 ,(space-packet-slot-get 'data-length 'dat8))))
+				       (funcall printf (string "sync-marker=0x%x\\n") (aref dat16 6))
+				       (funcall printf (string "sync-marker=0x%x\\n") ,(space-packet-slot-get 'sync-marker 'dat8))
+				      
+				       (funcall printf (string "test-mode=0x%x\\n") ,(space-packet-slot-get 'test-mode 'dat8))
+				       (funcall printf (string "tx-pulse-start-frequency-magnitude=%d\\n") ,(space-packet-slot-get 'tx-pulse-start-frequency-magnitude 'dat8))))))
 				
 				(let ((rc :type int :init (funcall munmap mmapped_data filesize)))
 				  (funcall assert (== rc 0))))
